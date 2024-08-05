@@ -1,7 +1,9 @@
-#include "Wsc.h"
+#include "..\\include\Wsc.h"
 #include "esp_websocket_client.h"
 #include "esp_event.h"
+#include "esp_log.h"
 
+#define TAG "WebSocket"
 void websocket_event_handler(void *handler_args, esp_event_base_t base, int32_t event_id, void *event_data)
 {
     esp_websocket_event_data_t *data = (esp_websocket_event_data_t *)event_data;
@@ -18,7 +20,7 @@ void websocket_event_handler(void *handler_args, esp_event_base_t base, int32_t 
         ESP_LOGW(TAG, "Received=%.*s", data->data_len, (char *)data->data_ptr);
         ESP_LOGW(TAG, "Total payload length=%d, data_len=%d, current payload offset=%d\r\n", data->payload_len, data->data_len, data->payload_offset);
 
-        xTimerReset(shutdown_signal_timer, portMAX_DELAY);
+        // xTimerReset(shutdown_signal_timer, portMAX_DELAY);
         break;
     case WEBSOCKET_EVENT_ERROR:
         ESP_LOGI(TAG, "WEBSOCKET_EVENT_ERROR");
@@ -35,5 +37,3 @@ void connectWsServer(const char* wsUrl) {
     esp_websocket_client_start(client);
 
 }
-
-
