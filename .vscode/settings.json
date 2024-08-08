@@ -21,7 +21,10 @@
         "wsc.h": "c",
         "esp_websocket_client.h": "c",
         "esp_gattc_api.h": "c",
-        "esp_bt_main.h": "c"
+        "esp_bt_main.h": "c",
+        "esp_gap_ble_api.h": "c",
+        "cstdlib": "c",
+        "esp_ibeacon_api.h": "c"
     },
     "idf.flashType": "UART"
 }
