@@ -32,6 +32,8 @@
 #include "esp_log.h"
 #include "freertos/FreeRTOS.h"
 
+#include "iBeacon.h"
+
 #define IBEACON_RECEIVER    1
 
 
@@ -51,6 +53,8 @@ static esp_ble_scan_params_t ble_scan_params = {
 };
 
 // struct ibeacon_device ibeacon_devices[20] = {};
+esp_ble_ibeacon_t* BEACON_DEVICES[20];
+int BEACON_DEVICES_LEN = 0;
 
 static void esp_gap_cb(esp_gap_ble_cb_event_t event, esp_ble_gap_cb_param_t *param)
 {
@@ -83,26 +87,29 @@ static void esp_gap_cb(esp_gap_ble_cb_event_t event, esp_ble_gap_cb_param_t *par
             /* Search for BLE iBeacon Packet */
             if (esp_ble_is_ibeacon_packet(scan_result->scan_rst.ble_adv, scan_result->scan_rst.adv_data_len)){
                 esp_ble_ibeacon_t *ibeacon_data = (esp_ble_ibeacon_t*)(scan_result->scan_rst.ble_adv);
-                ESP_LOGI(DEMO_TAG, "----------iBeacon Found----------");
-                esp_log_buffer_hex("IBEACON_DEMO: Device address:", scan_result->scan_rst.bda, ESP_BD_ADDR_LEN );
-                esp_log_buffer_hex("IBEACON_DEMO: Proximity UUID:", ibeacon_data->ibeacon_vendor.proximity_uuid, ESP_UUID_LEN_128);
+                adv_name = esp_ble_resolve_adv_data(scan_result->scan_rst.ble_adv, ESP_BLE_AD_TYPE_NAME_CMPL, &adv_name_len);
+                if (adv_name_len > 0 && strcmp("Holy-IOT", (const char*)adv_name) == 0) {
+                    ESP_LOGI(DEMO_TAG, "----------iBeacon Found----------");
+                    esp_log_buffer_hex("IBEACON_DEMO: Device address:", scan_result->scan_rst.bda, ESP_BD_ADDR_LEN );
+                    esp_log_buffer_hex("IBEACON_DEMO: Proximity UUID:", ibeacon_data->ibeacon_vendor.proximity_uuid, ESP_UUID_LEN_128);
 
-                uint16_t major = ENDIAN_CHANGE_U16(ibeacon_data->ibeacon_vendor.major);
-                uint16_t minor = ENDIAN_CHANGE_U16(ibeacon_data->ibeacon_vendor.minor);
-                ESP_LOGI(DEMO_TAG, "Major: 0x%04x (%d)", major, major);
-                ESP_LOGI(DEMO_TAG, "Minor: 0x%04x (%d)", minor, minor);
-                ESP_LOGI(DEMO_TAG, "Measured power (RSSI at a 1m distance):%d dbm", ibeacon_data->ibeacon_vendor.measured_power);
-                ESP_LOGI(DEMO_TAG, "RSSI of packet:%d dbm", scan_result->scan_rst.rssi);
+                    uint16_t major = ENDIAN_CHANGE_U16(ibeacon_data->ibeacon_vendor.major);
+                    uint16_t minor = ENDIAN_CHANGE_U16(ibeacon_data->ibeacon_vendor.minor);
+                    ESP_LOGI(DEMO_TAG, "Major: 0x%04x (%d)", major, major);
+                    ESP_LOGI(DEMO_TAG, "Minor: 0x%04x (%d)", minor, minor);
+                    ESP_LOGI(DEMO_TAG, "Measured power (RSSI at a 1m distance):%d dbm", ibeacon_data->ibeacon_vendor.measured_power);
+                    ESP_LOGI(DEMO_TAG, "RSSI of packet:%d dbm", scan_result->scan_rst.rssi);
+                    if (BEACON_DEVICES_LEN < 20) {
+                        BEACON_DEVICES[BEACON_DEVICES_LEN++] = ibeacon_data;
+                    }
+                }               
             }
             // esp_log_buffer_hex(DEMO_TAG, scan_result->scan_rst.bda, 6);
             // ESP_LOGI(DEMO_TAG, "searched Adv Data Len %d, Scan Response Len %d", scan_result->scan_rst.adv_data_len, scan_result->scan_rst.scan_rsp_len);
-            adv_name = esp_ble_resolve_adv_data(scan_result->scan_rst.ble_adv,
-                                                ESP_BLE_AD_TYPE_NAME_CMPL, &adv_name_len);
+
             // ESP_LOGI(DEMO_TAG, "searched Device Name Len %d", adv_name_len);
             // esp_log_buffer_char(DEMO_TAG, adv_name, adv_name_len);
 
-            // int8_t rssi = param->scan_rst.rssi;
-            // ESP_LOGI(DEMO_TAG, "Device found, RSSI: %d", rssi);
             break;
         default:
             break;
@@ -146,7 +153,7 @@ void ble_ibeacon_init(void)
     ble_ibeacon_appRegister();
 }
 
-void app_main(void)
+void startScan(void)
 {
     ESP_ERROR_CHECK(nvs_flash_init());
     ESP_ERROR_CHECK(esp_bt_controller_mem_release(ESP_BT_MODE_CLASSIC_BT));
