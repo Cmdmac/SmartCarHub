@@ -92,34 +92,58 @@ void chanelWithCar(void* parameter) {
     
 }
 
+iBeacon* BEACONS = NULL;
 
-void testWebSocket(void* parameter) {
-
-    initWifi();
-
-
-    connectWsServer("ws://cmdmac.top:3000/mobile");
-
+void intArrayToHexString(int arr[], int size, char* str) {
+    int i, offset = 0;
+    for (i = 0; i < size; i++) {
+        offset += sprintf(str + offset, "0x%04x ", arr[i]);
+    }
 }
 
-void onDeviceFound(iBeacon* devices, int size) {
-    for (int i = 0; i < size; i++) {
-        iBeacon beacon = devices[i];
-        ESP_LOGI("MAIN", "ibeacons len = %d", i);
-        esp_log_buffer_hex("IBEACON_DEMO: Device address:", beacon.addr, ESP_BD_ADDR_LEN);
-        // esp_log_buffer_hex("IBEACON_DEMO: Proximity UUID:", beacon.data->ibeacon_vendor.proximity_uuid, ESP_UUID_LEN_128);
-        ESP_LOGI("MAIN", "Major:  (%d)", beacon.major);
-        ESP_LOGI("MAIN", "Minor:  (%d)", beacon.minor);
-        // ESP_LOGI("MAIN", "Measured power (RSSI at a 1m distance):%d dbm", beacon.data->ibeacon_vendor.measured_power);
-        ESP_LOGI("MAIN", "RSSI of packet:%d dbm", beacon.rssi);
-    }
+void initWebSocket(void* parameter) {
 
+    initWifi();
+    connectWsServer("ws://cmdmac.top:3000/mobile");
+    while (!isWsConnected()) {        
+        vTaskDelay(500 / portTICK_PERIOD_MS);
+    }
+    while(isWsConnected()) {
+        if (BEACONS != NULL) {
+            for(int i = 0; i < 3; i++) {
+                char str[128] = {0};
+                char s[32] = {0};
+                intArrayToHexString(BEACONS[i].addr, sizeof(BEACONS[i]), str);
+                sprintf(str, "mac=%s, rssi=%d", s, BEACONS[i].rssi);
+                printf("send\r\n");
+                wsSendText(str, strlen(str));
+            }
+            
+        }
+        vTaskDelay(500 / portTICK_PERIOD_MS);
+    }
+}
+
+void onIBeaconsFound(iBeacon* devices, int size) {
+    // for (int i = 0; i < size; i++) {
+    //     iBeacon beacon = devices[i];
+    //     ESP_LOGI("MAIN", "ibeacons len = %d", i);
+    //     esp_log_buffer_hex("IBEACON_DEMO: Device address:", beacon.addr, ESP_BD_ADDR_LEN);
+    //     // esp_log_buffer_hex("IBEACON_DEMO: Proximity UUID:", beacon.data->ibeacon_vendor.proximity_uuid, ESP_UUID_LEN_128);
+    //     ESP_LOGI("MAIN", "Major:  (%d)", beacon.major);
+    //     ESP_LOGI("MAIN", "Minor:  (%d)", beacon.minor);
+    //     // ESP_LOGI("MAIN", "Measured power (RSSI at a 1m distance):%d dbm", beacon.data->ibeacon_vendor.measured_power);
+    //     ESP_LOGI("MAIN", "RSSI of packet:%d dbm", beacon.rssi);
+    // }
+    BEACONS = devices;
+    iBeacon* closestDevices[3] = {0};
+    
 }
 
 
 void app_main(void)
 {
-    FuniBeaconScanCallback callback = onDeviceFound;
+    iBeaconScanCallback callback = onIBeaconsFound;
     startScanIbeacon(callback);
-
+    initWebSocket(NULL);
 }

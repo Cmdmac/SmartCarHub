@@ -34,7 +34,7 @@
 
 #include "iBeacon.h"
 
-FuniBeaconScanCallback BCEACON_CALLBACK = NULL;
+iBeaconScanCallback BCEACON_CALLBACK = NULL;
 
 static const char* DEMO_TAG = "IBEACON_DEMO";
 // extern esp_ble_ibeacon_vendor_t vendor_config;
@@ -162,7 +162,7 @@ void ble_ibeacon_init(void)
     ble_ibeacon_appRegister();
 }
 
-void startScanIbeacon(FuniBeaconScanCallback callback)
+void startScanIbeacon(iBeaconScanCallback callback)
 {
     BCEACON_CALLBACK = callback; 
     ESP_ERROR_CHECK(nvs_flash_init());

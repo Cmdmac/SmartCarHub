@@ -4,6 +4,10 @@
 #include "esp_log.h"
 
 #define TAG "WebSocket"
+
+WsOnMessage wsCallback = NULL;
+esp_websocket_client_handle_t gClient = NULL;
+
 void websocket_event_handler(void *handler_args, esp_event_base_t base, int32_t event_id, void *event_data)
 {
     esp_websocket_event_data_t *data = (esp_websocket_event_data_t *)event_data;
@@ -33,7 +37,19 @@ void connectWsServer(const char* wsUrl) {
     esp_websocket_client_config_t websocket_cfg = {};
     websocket_cfg.uri = wsUrl;
     esp_websocket_client_handle_t client = esp_websocket_client_init(&websocket_cfg);
+    gClient = client;
     esp_websocket_register_events(client, WEBSOCKET_EVENT_ANY, websocket_event_handler, (void *)client);
     esp_websocket_client_start(client);
+}
 
+bool isWsConnected() {
+   return esp_websocket_client_is_connected(gClient);
+}
+
+void wsSendText(const char* data, int len) {
+    if (esp_websocket_client_is_connected(gClient)) {
+            // int len = sprintf(data, "hello %04d", i++);
+            // ESP_LOGI(TAG, "Sending %s", data);
+        esp_websocket_client_send_text(gClient, data, len, portMAX_DELAY);
+    }
 }

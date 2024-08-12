@@ -9,7 +9,7 @@ typedef struct {
     int rssi;
 }__attribute__((packed)) iBeacon;
 
-typedef void (*FuniBeaconScanCallback)(iBeacon*, int);
-void startScanIbeacon(FuniBeaconScanCallback callback);
+typedef void (*iBeaconScanCallback)(iBeacon*, int);
+void startScanIbeacon(iBeaconScanCallback callback);
 
 #endif

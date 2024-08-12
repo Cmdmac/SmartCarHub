@@ -6,4 +6,9 @@ void websocket_event_handler(void *handler_args, esp_event_base_t base, int32_t 
 
 void connectWsServer(const char* wsUrl);
 
+typedef void (*WsOnMessage)(char*, int);
+
+bool isWsConnected();
+void wsSendText(const char* data, int len);
+
 #endif
