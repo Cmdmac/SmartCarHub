@@ -32,6 +32,7 @@
 #include "esp_gatt_defs.h"
 #include "esp_bt_main.h"
 // #include "esp_gatt_common_api.h"
+#include "iBeacon.h"
 
 #define TAG "BLE_BEACON"
 
@@ -101,8 +102,24 @@ void testWebSocket(void* parameter) {
 
 }
 
+void onDeviceFound(iBeacon* devices, int size) {
+    for (int i = 0; i < size; i++) {
+        iBeacon beacon = devices[i];
+        ESP_LOGI("MAIN", "ibeacons len = %d", i);
+        esp_log_buffer_hex("IBEACON_DEMO: Device address:", beacon.addr, ESP_BD_ADDR_LEN);
+        // esp_log_buffer_hex("IBEACON_DEMO: Proximity UUID:", beacon.data->ibeacon_vendor.proximity_uuid, ESP_UUID_LEN_128);
+        ESP_LOGI("MAIN", "Major:  (%d)", beacon.major);
+        ESP_LOGI("MAIN", "Minor:  (%d)", beacon.minor);
+        // ESP_LOGI("MAIN", "Measured power (RSSI at a 1m distance):%d dbm", beacon.data->ibeacon_vendor.measured_power);
+        ESP_LOGI("MAIN", "RSSI of packet:%d dbm", beacon.rssi);
+    }
+
+}
+
+
 void app_main(void)
 {
-  
+    FuniBeaconScanCallback callback = onDeviceFound;
+    startScanIbeacon(callback);
 
 }
