@@ -5,7 +5,7 @@
 #include <string>
 #include "iBeacon.h"
 #include <HTTPClient.h>
-
+#include "QMC5883LCompass.h"
 const char* ssid     = "Stark";  // 替换为您的 Wi-Fi 网络名称
 const char* password = "fengzhiping,1101";  // 替换为您的 Wi-Fi 密码
 const char* websockets_url = "ws://192.168.1.4:3000/mobile"; //Enter server adress
@@ -32,6 +32,7 @@ void onEventsCallback(WebsocketsEvent event, String data) {
 
 
 WebsocketsClient client;
+QMC5883LCompass compass;
 
 iBeaconFinder finder;
 void scanIBeacons() {
@@ -96,11 +97,26 @@ void setup() {
 
   finder.init();
   // 设置定时器
-  ticker1.start();
+  // ticker1.start();
+
+  compass.init(17, 18);
+
 }
 
 void loop() {
     client.poll();
-    ticker1.update();
+    // ticker1.update();
+
+    int a;
+  
+    // Read compass values
+    compass.read();
+
+    // Return Azimuth reading
+    a = compass.getAzimuth();
+    
+    Serial.print("A: ");
+    Serial.print(a);
+    Serial.println();
     
 }

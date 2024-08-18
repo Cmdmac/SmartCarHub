@@ -37,7 +37,7 @@ class iBeaconFinder {
         BleCallback* pBleCallback;
         
         static bool compareiBeacon(const iBeacon& p1, const iBeacon& p2) {
-            return p1.rssi < p2.rssi;
+            return p1.rssi > p2.rssi;
         }
     public:
         iBeaconFinder();
