@@ -39,10 +39,14 @@ void scanIBeacons() {
 }
 
 void compassTask(void* params) {
+  // Serial.begin(9600);
+  // Serial.println("test");
   QMC5883LCompass compass;
   compass.init(17, 18);
-  // while(1) {
-    int a;
+  int a;
+  while(1) {
+    // compassTask(NULL);
+
     // Read compass values
     compass.read();
     // Return Azimuth reading
@@ -50,23 +54,29 @@ void compassTask(void* params) {
     Serial.print("A: ");
     Serial.print(a);
     Serial.println();
-  // }
+    delay(1000);
+  }
 }
 
-  Ticker ticker1(scanIBeacons, 1000, 0, MILLIS);
+
+
+Ticker beaconTimer(scanIBeacons, 1000, 0, MILLIS);
 
 void setup() {
-  // 设置定时器
-  ticker1.start();
+  Serial.begin(9600);
+  
+  xTaskCreatePinnedToCore(compassTask, "CompassTask", 4096, NULL, 1, NULL, 0);
 
-  ::setUpWebsocket();
+  // init ble,wifi,websocket
   finder.init();
-
+  ::setUpWebsocket();
+  // start timeer
+  beaconTimer.start();
 
 }
 
 void loop() {
     client.poll();
-    ticker1.update();
-    compassTask(NULL);
+    beaconTimer.update(); 
+    
 }
