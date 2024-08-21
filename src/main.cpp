@@ -8,11 +8,19 @@
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
 #include "net.h"
+#include "Audio.h"
+
+
+
 using namespace std;
 using namespace websockets;
 
 iBeaconFinder finder;
 extern WebsocketsClient client;
+
+#define I2S_DOUT      40
+#define I2S_BCLK      41
+#define I2S_LRC       42
 
 void scanIBeacons() {
   Serial.println("scanIBeacons");
@@ -62,21 +70,48 @@ void compassTask(void* params) {
 
 Ticker beaconTimer(scanIBeacons, 1000, 0, MILLIS);
 
+Audio audio; 
+// void audioTask(void* params) {
+//   Audio audio;  
+//   audio.setPinout(I2S_BCLK, I2S_LRC, I2S_DOUT);
+//   audio.setVolume(10); // 0...21
+//   while(1) {
+//     audio.connecttohost("http://192.168.1.4:3000/voice2.mp3");
+//     audio.loop();
+//     delay(15000);
+//   }
+// }
+
 void setup() {
   Serial.begin(9600);
   
-  xTaskCreatePinnedToCore(compassTask, "CompassTask", 4096, NULL, 1, NULL, 0);
+  // create compass task
+  // xTaskCreatePinnedToCore(compassTask, "CompassTask", 4096, NULL, 1, NULL, 0);
+  // xTaskCreatePinnedToCore(audioTask, "AudioTask", 8192 * 2, NULL, 1, NULL, 0);
+
 
   // init ble,wifi,websocket
-  finder.init();
-  ::setUpWebsocket();
+  // finder.init();
+  // ::setUpWebsocket();
   // start timeer
-  beaconTimer.start();
+  // beaconTimer.start();
+
+  WiFi.begin("Stark", "fengzhiping,1101");
+
+  while (WiFi.status()!= WL_CONNECTED) {
+    delay(1000);
+    Serial.println("Connecting to WiFi...");
+  }
+
+  audio.setPinout(I2S_BCLK, I2S_LRC, I2S_DOUT);
+  audio.setVolume(18); // 0...21
+  audio.connecttohost("http://192.168.1.4:3000/voice2.mp3");
 
 }
 
 void loop() {
-    client.poll();
-    beaconTimer.update(); 
-    
+  // client.poll();
+  // beaconTimer.update(); 
+  audio.loop();
+  // delay(15000);
 }
