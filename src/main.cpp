@@ -9,7 +9,7 @@
 #include <freertos/task.h>
 #include "net.h"
 #include "Audio.h"
-
+#include "Camera.h"
 
 
 using namespace std;
@@ -81,7 +81,7 @@ Audio audio;
 //     delay(15000);
 //   }
 // }
-
+Camera camera;
 void setup() {
   Serial.begin(9600);
   
@@ -105,7 +105,10 @@ void setup() {
 
   audio.setPinout(I2S_BCLK, I2S_LRC, I2S_DOUT);
   audio.setVolume(18); // 0...21
-  audio.connecttohost("http://192.168.1.4:3000/voice2.mp3");
+  audio.connecttohost("http://192.168.1.4:3000/voice.mp3");
+
+  camera.setUp();
+  camera.startStreamServer();
 
 }
 
