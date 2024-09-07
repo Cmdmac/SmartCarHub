@@ -26,24 +26,30 @@ void scanIBeacons() {
   Serial.println("scanIBeacons");
   finder.find();
   vector<iBeacon> devices = finder.getDevices();
-  if (devices.size() >= 3) {
-    string mac1 = devices[0].address;
-    string mac2 = devices[1].address;
-    string mac3 = devices[2].address;
+  // if (devices.size() >= 3) {
+  //   string mac1 = devices[0].address;
+  //   string mac2 = devices[1].address;
+  //   string mac3 = devices[2].address;
 
-    int rssi1 = devices[0].rssi;
-    int rssi2 = devices[1].rssi;
-    int rssi3 = devices[2].rssi;
+  //   int rssi1 = devices[0].rssi;
+  //   int rssi2 = devices[1].rssi;
+  //   int rssi3 = devices[2].rssi;
 
     
-    std::stringstream ss;
-    ss << "http://192.168.1.4:3000/locate?"  << "mac1=" << mac1 << "&mac2=" << mac2 << "&mac3=" << mac3 << "&rssi1=" << rssi1 << "&rssi2=" << rssi2 << "&rssi3=" << rssi3;
+  //   std::stringstream ss;
+  //   ss << "http://192.168.2.153:3000/locate?"  << "mac1=" << mac1 << "&mac2=" << mac2 << "&mac3=" << mac3 << "&rssi1=" << rssi1 << "&rssi2=" << rssi2 << "&rssi3=" << rssi3;
 
-    Serial.println(ss.str().c_str());
+  //   Serial.println(ss.str().c_str());
 
-    ::httpGet(ss.str());
+  //   ::httpGet(ss.str());
+  // }
+  std::stringstream ss;
+  ss << "http://192.168.2.153:3000/locate?";
+  for (int i = 0; i < devices.size(); i++) {
+    ss << "mac" << i + 1 << "=" << devices[i].address << "&rssi" << i + 1 << "=" << devices[i].rssi << "&";
   }
-
+  // Serial.println(ss.str().c_str());
+  ::httpGet(ss.str());
 }
 
 void compassTask(void* params) {
@@ -91,30 +97,34 @@ void setup() {
 
 
   // init ble,wifi,websocket
-  // finder.init();
-  // ::setUpWebsocket();
+  finder.init();
+  ::setUpWebsocket();
   // start timeer
-  // beaconTimer.start();
+  beaconTimer.start();
 
   WiFi.begin("Stark", "fengzhiping,1101");
 
+  Serial.println("Connecting to WiFi...");
   while (WiFi.status()!= WL_CONNECTED) {
     delay(1000);
-    Serial.println("Connecting to WiFi...");
+    Serial.println(".");
   }
+  Serial.print("Camera Ready! Use 'http://");
+  Serial.print(WiFi.localIP());
+  Serial.println("' to connect");
 
-  audio.setPinout(I2S_BCLK, I2S_LRC, I2S_DOUT);
-  audio.setVolume(18); // 0...21
-  audio.connecttohost("http://192.168.1.4:3000/voice.mp3");
+  // audio.setPinout(I2S_BCLK, I2S_LRC, I2S_DOUT);
+  // audio.setVolume(18); // 0...21
+  // audio.connecttohost("http://192.168.1.4:3000/voice.mp3");
 
-  camera.setUp();
-  camera.startStreamServer();
+  // camera.setUp();
+  // camera.startStreamServer();
 
 }
 
 void loop() {
-  // client.poll();
-  // beaconTimer.update(); 
+  client.poll();
+  beaconTimer.update(); 
   audio.loop();
   // delay(15000);
 }

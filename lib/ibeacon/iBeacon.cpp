@@ -15,7 +15,7 @@ void BleCallback::onResult(BLEAdvertisedDevice adv) {
         bool isFound = false;
         for (std::vector<iBeacon>::iterator it = devices.begin(); it!= devices.end(); ++it) {
             if (it->address.compare(address) == 0) {
-                it->rssi - adv.getRSSI();
+                it->rssi = adv.getRSSI();
                 isFound = true;
                 break;
             }
