@@ -27,7 +27,7 @@ string httpGet(string url) {
 WebsocketsClient client;
 const char* ssid     = "Stark";  // 替换为您的 Wi-Fi 网络名称
 const char* password = "fengzhiping,1101";  // 替换为您的 Wi-Fi 密码
-const char* websockets_url = "ws://192.168.1.4:3000/mobile"; //Enter server adress
+const char* websockets_url = "ws://192.168.2.153:3000/mobile/hub"; //Enter server adress
 
 
 void onMessageCallback(WebsocketsMessage message) {

@@ -18,6 +18,7 @@ using namespace websockets;
 iBeaconFinder finder;
 extern WebsocketsClient client;
 
+
 #define I2S_DOUT      40
 #define I2S_BCLK      41
 #define I2S_LRC       42
@@ -65,6 +66,9 @@ void compassTask(void* params) {
     compass.read();
     // Return Azimuth reading
     a = compass.getAzimuth();
+    std::stringstream ss;
+    ss << "{command:10, data:" << a << "}";
+    client.send(ss.str().c_str());
     Serial.print("A: ");
     Serial.print(a);
     Serial.println();
@@ -92,7 +96,7 @@ void setup() {
   Serial.begin(9600);
   
   // create compass task
-  // xTaskCreatePinnedToCore(compassTask, "CompassTask", 4096, NULL, 1, NULL, 0);
+  xTaskCreatePinnedToCore(compassTask, "CompassTask", 4096, NULL, 1, NULL, 0);
   // xTaskCreatePinnedToCore(audioTask, "AudioTask", 8192 * 2, NULL, 1, NULL, 0);
 
 
@@ -102,16 +106,16 @@ void setup() {
   // start timeer
   beaconTimer.start();
 
-  WiFi.begin("Stark", "fengzhiping,1101");
+  // WiFi.begin("Stark", "fengzhiping,1101");
 
-  Serial.println("Connecting to WiFi...");
-  while (WiFi.status()!= WL_CONNECTED) {
-    delay(1000);
-    Serial.println(".");
-  }
-  Serial.print("Camera Ready! Use 'http://");
-  Serial.print(WiFi.localIP());
-  Serial.println("' to connect");
+  // Serial.println("Connecting to WiFi...");
+  // while (WiFi.status()!= WL_CONNECTED) {
+  //   delay(1000);
+  //   Serial.println(".");
+  // }
+  // Serial.print("Camera Ready! Use 'http://");
+  // Serial.print(WiFi.localIP());
+  // Serial.println("' to connect");
 
   // audio.setPinout(I2S_BCLK, I2S_LRC, I2S_DOUT);
   // audio.setVolume(18); // 0...21
