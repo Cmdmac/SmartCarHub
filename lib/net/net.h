@@ -4,6 +4,7 @@
 using namespace std;
 
 string httpGet(string url);
+void setUpWifi();
 void setUpWebsocket();
 
 #endif

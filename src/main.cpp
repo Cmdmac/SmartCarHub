@@ -10,7 +10,7 @@
 #include "net.h"
 #include "Audio.h"
 #include "Camera.h"
-
+#include "code.h"
 
 using namespace std;
 using namespace websockets;
@@ -65,10 +65,10 @@ void compassTask(void* params) {
     // Read compass values
     compass.read();
     // Return Azimuth reading
-    a = compass.getAzimuth();
-    std::stringstream ss;
-    ss << "{command:10, data:" << a << "}";
-    client.send(ss.str().c_str());
+    a = compass.getAzimuth() + 180;
+    string s = CodeBuilder::CreateCodeJson(DIRECTION, a);
+    // Serial.println(s.c_str());
+    client.send(s.c_str());
     Serial.print("A: ");
     Serial.print(a);
     Serial.println();
@@ -102,6 +102,7 @@ void setup() {
 
   // init ble,wifi,websocket
   finder.init();
+  ::setUpWifi();
   ::setUpWebsocket();
   // start timeer
   beaconTimer.start();

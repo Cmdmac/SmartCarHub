@@ -6,7 +6,7 @@ BleCallback::BleCallback() : len(0) {
 }
 
 void BleCallback::onResult(BLEAdvertisedDevice adv) {
-    // Serial.println("设备名称: " + adv.getName() + "MAC 地址: " + adv.getAddress().toString() + "RSSI: " + adv.getRSSI());
+    // Serial.println("设备名称: " + adv.getName() + "MAC 地址: " + adv.getAddress().toString() + "RSSI: " + new String(adv.getRSSI()));
     const char*name = adv.getName().c_str();
     // Serial.println(adv.getName().c_str());
     if (strcmp(name, "Holy-IOT") == 0) {
@@ -16,6 +16,9 @@ void BleCallback::onResult(BLEAdvertisedDevice adv) {
         for (std::vector<iBeacon>::iterator it = devices.begin(); it!= devices.end(); ++it) {
             if (it->address.compare(address) == 0) {
                 it->rssi = adv.getRSSI();
+                // Serial.print("found:");
+                // Serial.print(adv.getAddress().toString().c_str());
+                // Serial.println(adv.getRSSI());
                 isFound = true;
                 break;
             }

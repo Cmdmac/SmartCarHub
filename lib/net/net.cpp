@@ -47,9 +47,7 @@ void onEventsCallback(WebsocketsEvent event, String data) {
     }
 }
 
-void setUpWebsocket() {
-  Serial.begin(9600);
-
+void setUpWifi() {
   WiFi.begin(ssid, password);
 
   while (WiFi.status()!= WL_CONNECTED) {
@@ -58,6 +56,11 @@ void setUpWebsocket() {
   }
 
   Serial.println("Connected to WiFi");
+}
+
+void setUpWebsocket() {
+  Serial.begin(9600);
+  Serial.println("setup websocket");
   client.onMessage(onMessageCallback);
   client.onEvent(onEventsCallback);
   client.connect(websockets_url);
