@@ -10,7 +10,10 @@
 #include "net.h"
 #include "Audio.h"
 #include "Camera.h"
-#include "code.h"
+#include "Command.h"
+#include "Car.h"
+#include "Motor_TB6612FNG.h"
+#include "UltraSound.h"
 
 using namespace std;
 using namespace websockets;
@@ -53,11 +56,13 @@ void scanIBeacons() {
   ::httpGet(ss.str());
 }
 
+  
+QMC5883LCompass compass;
 void compassTask(void* params) {
   // Serial.begin(9600);
   // Serial.println("test");
-  QMC5883LCompass compass;
-  compass.init(17, 18);
+
+  compass.init(5, 4);
   int a;
   while(1) {
     // compassTask(NULL);
@@ -66,7 +71,7 @@ void compassTask(void* params) {
     compass.read();
     // Return Azimuth reading
     a = compass.getAzimuth() + 180;
-    string s = CodeBuilder::CreateCodeJson(DIRECTION, a);
+    string s = CommandBuilder::CreateCodeJson(CMD_DIRECTION, a);
     // Serial.println(s.c_str());
     client.send(s.c_str());
     Serial.print("A: ");
@@ -75,7 +80,6 @@ void compassTask(void* params) {
     delay(1000);
   }
 }
-
 
 
 Ticker beaconTimer(scanIBeacons, 1000, 0, MILLIS);
@@ -92,11 +96,28 @@ Audio audio;
 //   }
 // }
 Camera camera;
+
+Motor_TB6612FNG l = Motor_TB6612FNG(15, 16, 17, 18);
+Motor_TB6612FNG r = Motor_TB6612FNG(8, 3, 46, 18);
+Servo s = Servo(8);
+UltraSound us = UltraSound(6, 7);
+Car car = Car(&l, &r, &s, &us);
+
+void ultrSoundTask(void* params) {
+  while (1)
+  {
+    int d = us.getDistance();
+    Serial.println(d);
+  }
+  
+}
 void setup() {
   Serial.begin(9600);
   
   // create compass task
   xTaskCreatePinnedToCore(compassTask, "CompassTask", 4096, NULL, 1, NULL, 0);
+  xTaskCreatePinnedToCore(ultrSoundTask, "ultrSoundTask", 4096, NULL, 1, NULL, 1);
+
   // xTaskCreatePinnedToCore(audioTask, "AudioTask", 8192 * 2, NULL, 1, NULL, 0);
 
 
