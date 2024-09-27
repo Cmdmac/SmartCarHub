@@ -6,16 +6,19 @@ class Led {
         void on();
         void off();
         void setFlickerInterval(int interval);
-        void autoFlicker();
+        void flicker();
         void setFadeMount(int fadeMount);
-        void setMaxBrightness();
-        void setMinBrightness();
-        void setBrightness();
+        void setBrightness(int brightness);
         void autoFade();
 
     private:
         int mPin;
         int mFlickerInterval;
+        int mFadeMount;
+        int mMax;
+        int mMin;
+        int mBrightness;
+
 };
 
 #endif
