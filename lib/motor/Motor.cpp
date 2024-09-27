@@ -71,5 +71,10 @@ void Motor::speedDown() {
 }
 
 void Motor::setSpeed(float speed) {
+  this->speed = speed;
   analogWrite(this->pinPwm, this->speed * 255);  
+}
+
+float Motor::getSpeed() {
+  return this->speed;
 }

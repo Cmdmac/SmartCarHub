@@ -29,6 +29,7 @@ public:
   void speedUp();
   void speedDown();
   void setSpeed(float speed);
+  float getSpeed();
 };
 
 #endif

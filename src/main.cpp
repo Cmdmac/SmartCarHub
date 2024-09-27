@@ -14,6 +14,8 @@
 #include "Car.h"
 #include "Motor_TB6612FNG.h"
 #include "UltraSound.h"
+#include <ESP32Servo.h>
+#include "Led.h"
 
 using namespace std;
 using namespace websockets;
@@ -97,26 +99,43 @@ Audio audio;
 // }
 Camera camera;
 
-Motor_TB6612FNG l = Motor_TB6612FNG(15, 16, 17, 18);
-Motor_TB6612FNG r = Motor_TB6612FNG(8, 3, 46, 18);
-Servo s = Servo(8);
-UltraSound us = UltraSound(6, 7);
-Car car = Car(&l, &r, &s, &us);
+Motor_TB6612FNG l = Motor_TB6612FNG(9, 10, 11, 12);
+Motor_TB6612FNG r = Motor_TB6612FNG(39, 40, 41, 12);
+// Servo s = Servo(19);
+// UltraSound us = UltraSound(6, 7);
+// Car car = Car(&l, &r, &s, &us);
 
-void ultrSoundTask(void* params) {
-  while (1)
-  {
-    int d = us.getDistance();
-    Serial.println(d);
-  }
+#define SERVO_PIN   17
+#define MAX_WIDTH   2500
+#define MIN_WIDTH   1000
+Servo my_servo;
+// void ultrSoundTask(void* params) {
+//   while (1)
+//   {
+//     int d = us.getDistance();
+//     Serial.println(d);
+//   }
   
-}
+// }
+
+// void servoTask(void* params) {
+//   s.to(45);
+//   delay(1000);
+//   s.to(90);
+//   delay(1000);
+//   s.to(120);
+//   delay(1000);
+// }
+
+Led led = Led(21);
 void setup() {
   Serial.begin(9600);
   
   // create compass task
   xTaskCreatePinnedToCore(compassTask, "CompassTask", 4096, NULL, 1, NULL, 0);
-  xTaskCreatePinnedToCore(ultrSoundTask, "ultrSoundTask", 4096, NULL, 1, NULL, 1);
+  // xTaskCreatePinnedToCore(ultrSoundTask, "ultrSoundTask", 4096, NULL, 1, NULL, 1);
+  // xTaskCreatePinnedToCore(servoTask, "servoTask", 2048, NULL, 1, NULL, 1);
+
 
   // xTaskCreatePinnedToCore(audioTask, "AudioTask", 8192 * 2, NULL, 1, NULL, 0);
 
@@ -146,11 +165,48 @@ void setup() {
   // camera.setUp();
   // camera.startStreamServer();
 
+  ESP32PWM::allocateTimer(0);
+  ESP32PWM::allocateTimer(1);
+  ESP32PWM::allocateTimer(2);
+  ESP32PWM::allocateTimer(3);
+  // 设置频率
+  my_servo.setPeriodHertz(50);
+  // 关联 servo 对象与 GPIO 引脚，设置脉宽范围
+  my_servo.attach(SERVO_PIN, MIN_WIDTH, MAX_WIDTH);
+
+  led.setFlickerInterval(500);
+  led.setFadeMount(10);
+
+  l.setSpeed(0.5);
+  l.forward();
+  r.forward();
 }
 
+int step = 0.1;
 void loop() {
-  client.poll();
-  beaconTimer.update(); 
-  audio.loop();
-  // delay(15000);
+  // client.poll();
+  // beaconTimer.update(); 
+  // audio.loop();
+  // // delay(15000);
+
+  // my_servo.write(90);
+  // delay(1000);
+  // my_servo.write(120);
+  // delay(1000);
+
+  float speed = l.getSpeed();
+  if (speed >= 1.0) {
+    step = -step;
+  } else if (speed <= 0) {
+    step = -step;
+  }
+  speed = speed + step;
+  Serial.println(speed);
+  l.setSpeed(speed);
+  r.setSpeed(speed);
+  delay(2000);
+  // led.flicker();
+  // led.autoFade();
+
+
 }
