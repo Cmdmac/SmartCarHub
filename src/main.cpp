@@ -11,18 +11,18 @@
 #include "Audio.h"
 #include "Camera.h"
 #include "Command.h"
-#include "Car.h"
+// #include "Car.h"
 #include "Motor_TB6612FNG.h"
 #include "UltraSound.h"
 #include <ESP32Servo.h>
 #include "Led.h"
+// #include "Hall.h"
 
 using namespace std;
 using namespace websockets;
 
 iBeaconFinder finder;
-extern WebsocketsClient client;
-
+Net net;
 
 #define I2S_DOUT      40
 #define I2S_BCLK      41
@@ -55,7 +55,7 @@ void scanIBeacons() {
     ss << "mac" << i + 1 << "=" << devices[i].address << "&rssi" << i + 1 << "=" << devices[i].rssi << "&";
   }
   // Serial.println(ss.str().c_str());
-  ::httpGet(ss.str());
+  Net::httpGet(ss.str());
 }
 
   
@@ -64,7 +64,7 @@ void compassTask(void* params) {
   // Serial.begin(9600);
   // Serial.println("test");
 
-  compass.init(5, 4);
+  compass.init(11, 10);
   int a;
   while(1) {
     // compassTask(NULL);
@@ -75,7 +75,7 @@ void compassTask(void* params) {
     a = compass.getAzimuth() + 180;
     string s = CommandBuilder::CreateCodeJson(CMD_DIRECTION, a);
     // Serial.println(s.c_str());
-    client.send(s.c_str());
+    net.ws().send(s.c_str());
     Serial.print("A: ");
     Serial.print(a);
     Serial.println();
@@ -84,7 +84,7 @@ void compassTask(void* params) {
 }
 
 
-Ticker beaconTimer(scanIBeacons, 1000, 0, MILLIS);
+// Ticker beaconTimer(scanIBeacons, 1000, 0, MILLIS);
 
 Audio audio; 
 // void audioTask(void* params) {
@@ -99,24 +99,28 @@ Audio audio;
 // }
 Camera camera;
 
-Motor_TB6612FNG l = Motor_TB6612FNG(9, 10, 11, 12);
-Motor_TB6612FNG r = Motor_TB6612FNG(39, 40, 41, 12);
+Motor_TB6612FNG l = Motor_TB6612FNG(17, 18, 16, 8);
+// Motor_TB6612FNG l = Motor_TB6612FNG(20, 21, 19, 8);
+Motor_TB6612FNG r = Motor_TB6612FNG(3, 46, 9, 8);
 // Servo s = Servo(19);
-// UltraSound us = UltraSound(6, 7);
+UltraSound us = UltraSound(7, 15);
 // Car car = Car(&l, &r, &s, &us);
 
-#define SERVO_PIN   17
+#define SERVO_PIN   0
 #define MAX_WIDTH   2500
 #define MIN_WIDTH   1000
-Servo my_servo;
-// void ultrSoundTask(void* params) {
-//   while (1)
-//   {
-//     int d = us.getDistance();
-//     Serial.println(d);
-//   }
+
+static const int servoPin = 35;
+
+Servo myservo;
+void ultrSoundTask(void* params) {
+  while (1)
+  {
+    int d = us.getDistance();
+    Serial.println(d);
+  }
   
-// }
+}
 
 // void servoTask(void* params) {
 //   s.to(45);
@@ -126,8 +130,10 @@ Servo my_servo;
 //   s.to(120);
 //   delay(1000);
 // }
+#include "Hall.h"
+extern void initHall();
 
-Led led = Led(21);
+Led led = Led(14);
 void setup() {
   Serial.begin(9600);
   
@@ -142,10 +148,10 @@ void setup() {
 
   // init ble,wifi,websocket
   finder.init();
-  ::setUpWifi();
-  ::setUpWebsocket();
+  net.setUpWifi();
+  net.setUpWebsocket();
   // start timeer
-  beaconTimer.start();
+  // beaconTimer.start();
 
   // WiFi.begin("Stark", "fengzhiping,1101");
 
@@ -166,45 +172,61 @@ void setup() {
   // camera.startStreamServer();
 
   ESP32PWM::allocateTimer(0);
-  ESP32PWM::allocateTimer(1);
-  ESP32PWM::allocateTimer(2);
-  ESP32PWM::allocateTimer(3);
-  // 设置频率
-  my_servo.setPeriodHertz(50);
-  // 关联 servo 对象与 GPIO 引脚，设置脉宽范围
-  my_servo.attach(SERVO_PIN, MIN_WIDTH, MAX_WIDTH);
+	ESP32PWM::allocateTimer(1);
+	ESP32PWM::allocateTimer(2);
+	ESP32PWM::allocateTimer(3);
+	myservo.setPeriodHertz(50);    // standard 50 hz servo
+	myservo.attach(servoPin, 1000, 2000); // attaches the servo on pin 18 to the servo object
+	// }
+
+  // pinMode(servoPin, OUTPUT);
+
+	myservo.write(0);
 
   led.setFlickerInterval(500);
   led.setFadeMount(10);
 
   l.setSpeed(0.5);
-  l.forward();
-  r.forward();
+  l.backward();
+  r.backward();
+
+  // initHall();
 }
 
-int step = 0.1;
+float step = 0.1;
+int pos = 0;    // variable to store the servo position
+
 void loop() {
-  // client.poll();
+  net.loop();
   // beaconTimer.update(); 
   // audio.loop();
   // // delay(15000);
 
-  // my_servo.write(90);
-  // delay(1000);
-  // my_servo.write(120);
-  // delay(1000);
-
+  // for (pos = 0; pos <= 180; pos += 1) { // goes from 0 degrees to 180 degrees
+	// 	// in steps of 1 degree
+	// 	myservo.write(pos);    // tell servo to go to position in variable 'pos'
+	// 	delay(15);             // waits 15ms for the servo to reach the position
+	// }
+	// for (pos = 180; pos >= 0; pos -= 1) { // goes from 180 degrees to 0 degrees
+	// 	myservo.write(pos);    // tell servo to go to position in variable 'pos'
+	// 	delay(15);             // waits 15ms for the servo to reach the position
+	// }
   float speed = l.getSpeed();
   if (speed >= 1.0) {
     step = -step;
-  } else if (speed <= 0) {
+  } else if (speed <= 0.3) {
     step = -step;
   }
   speed = speed + step;
   Serial.println(speed);
-  l.setSpeed(speed);
-  r.setSpeed(speed);
-  delay(2000);
+  // r.setSpeed(speed);
+  // r.setSpeed(speed);
+  delay(1000);
+  r.forward();
+  l.forward();
+  delay(1000);
+  l.backward();
+  r.backward();
   // led.flicker();
   // led.autoFade();
 

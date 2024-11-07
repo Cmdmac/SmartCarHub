@@ -1,9 +1,6 @@
 #include "net.h"
-#include <ArduinoWebsockets.h>
 
-using namespace websockets;
-
-string httpGet(string url) {
+string Net::httpGet(string url) {
     HTTPClient http;
     http.begin(url.c_str());  // 替换为您要请求的 URL
 
@@ -24,18 +21,17 @@ string httpGet(string url) {
     return string();
 }
 
-WebsocketsClient client;
 const char* ssid     = "Stark";  // 替换为您的 Wi-Fi 网络名称
 const char* password = "fengzhiping,1101";  // 替换为您的 Wi-Fi 密码
 const char* websockets_url = "ws://192.168.2.153:3000/mobile/hub"; //Enter server adress
 
 
-void onMessageCallback(WebsocketsMessage message) {
+void Net::onMessageCallback(WebsocketsMessage message) {
     Serial.print("Got Message: ");
     Serial.println(message.data());
 }
 
-void onEventsCallback(WebsocketsEvent event, String data) {
+void Net::onEventsCallback(WebsocketsEvent event, String data) {
     if(event == WebsocketsEvent::ConnectionOpened) {
         Serial.println("Connnection Opened");
     } else if(event == WebsocketsEvent::ConnectionClosed) {
@@ -47,7 +43,7 @@ void onEventsCallback(WebsocketsEvent event, String data) {
     }
 }
 
-void setUpWifi() {
+void Net::setUpWifi() {
   WiFi.begin(ssid, password);
 
   while (WiFi.status()!= WL_CONNECTED) {
@@ -58,11 +54,19 @@ void setUpWifi() {
   Serial.println("Connected to WiFi");
 }
 
-void setUpWebsocket() {
+void Net::setUpWebsocket() {
   Serial.begin(9600);
   Serial.println("setup websocket");
-  client.onMessage(onMessageCallback);
-  client.onEvent(onEventsCallback);
+  client.onMessage([&](WebsocketsMessage msg){ onMessageCallback(msg); });
+  client.onEvent([&](WebsocketsEvent event, String data) { onEventsCallback(event, data); });
   client.connect(websockets_url);
 
+}
+
+WebsocketsClient& Net::ws() {
+  return client;
+}
+
+void Net::loop() {
+  client.poll();
 }

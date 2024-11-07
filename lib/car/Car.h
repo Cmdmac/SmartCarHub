@@ -1,14 +1,14 @@
 #ifndef CAR_H_
 #define CAR_H_
 #include "Motor.h"
-#include "Servo.h"
+// #include "Servo.h"
 #include "UltraSound.h"
 
 class Car {
   private:
     Motor *l;
     Motor *r;
-    Servo *s;
+    // Servo2 *s;
     UltraSound *us;
 
     char data[128] = {0};
@@ -18,7 +18,7 @@ class Car {
     void parse(char* data, int len);
 
   public:
-    Car(Motor* l, Motor *r, Servo *s, UltraSound *us);
+    Car(Motor* l, Motor *r, /*Servo2 *s,*/ UltraSound *us);
     // Car(int pin1Pos, int pin1Neg, int pin1Pwm, int pin2Pos, int pin2Neg, int pin2Pwm, int pinServo);
 
     void waitForHubMessages();

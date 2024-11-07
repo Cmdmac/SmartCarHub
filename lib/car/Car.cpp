@@ -2,7 +2,7 @@
 #include <Arduino.h>
 #include "Command.h"
 
-Car::Car(Motor *l, Motor *r, Servo *s, UltraSound *us) : l(l), r(r), s(s), us(us) {
+Car::Car(Motor *l, Motor *r, /*Servo2 *s,*/ UltraSound *us) : l(l), r(r), s(s), us(us) {
 
 }
 

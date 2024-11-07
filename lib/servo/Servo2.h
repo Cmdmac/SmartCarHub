@@ -1,12 +1,15 @@
 #ifndef SERVO_H_
 #define SERVO_H_
+// #include <ESP32Servo.h>
 
-class Servo {
+class Servo2 {
   private:
     int pinPwm;
+    // Servo my_servo;
+
   
   public:
-    Servo(int pin);
+    Servo2(int pin);
     void to(int angle);
 };
 
