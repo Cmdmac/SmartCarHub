@@ -5,18 +5,19 @@
 using namespace std;
 using namespace websockets;
 
-
+typedef std::function<void(int)> CommandCallback;
 class Net {
     public:
         static string httpGet(string url);
         void setUpWifi();
-        void setUpWebsocket();
+        void setUpWebsocket(CommandCallback callback);
         WebsocketsClient& ws();
         void loop();
     private:
         void onMessageCallback(WebsocketsMessage message);
         void onEventsCallback(WebsocketsEvent event, String data);
         WebsocketsClient client;
+        CommandCallback commandCallback;
 };
 
 #endif

@@ -5,6 +5,7 @@
 #include <string>
 #include <sstream>
 #include <vector>
+#include <Ticker.h>
 using namespace std;
 
 class iBeacon {
@@ -39,10 +40,23 @@ class iBeaconFinder {
         static bool compareiBeacon(const iBeacon& p1, const iBeacon& p2) {
             return p1.rssi > p2.rssi;
         }
+
+        static void searchBeacons(iBeaconFinder *pvParameters) {
+          // 将传入的参数转换为类的实例指针
+          iBeaconFinder* instance = static_cast<iBeaconFinder*>(pvParameters);
+          // 调用类的成员函数
+          instance->reportTask();
+        }
+
+        void reportTask();
+
     public:
         iBeaconFinder();
         void init();
         void find();
+        void findAndReportToServer();
         vector<iBeacon> getDevices();
+        Ticker beaconTimer;
+
 };
 #endif

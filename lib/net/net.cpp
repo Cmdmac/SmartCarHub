@@ -1,4 +1,5 @@
 #include "net.h"
+#include <ArduinoJson.h>
 
 string Net::httpGet(string url) {
     HTTPClient http;
@@ -29,6 +30,12 @@ const char* websockets_url = "ws://192.168.2.153:3000/mobile/hub"; //Enter serve
 void Net::onMessageCallback(WebsocketsMessage message) {
     Serial.print("Got Message: ");
     Serial.println(message.data());
+    JsonDocument doc;
+    deserializeJson(doc, message.data());
+    int cmd = doc["command"];
+    if (commandCallback != NULL) {
+        commandCallback(cmd);
+    }
 }
 
 void Net::onEventsCallback(WebsocketsEvent event, String data) {
@@ -54,13 +61,13 @@ void Net::setUpWifi() {
   Serial.println("Connected to WiFi");
 }
 
-void Net::setUpWebsocket() {
+void Net::setUpWebsocket(CommandCallback callback) {
   Serial.begin(9600);
   Serial.println("setup websocket");
   client.onMessage([&](WebsocketsMessage msg){ onMessageCallback(msg); });
   client.onEvent([&](WebsocketsEvent event, String data) { onEventsCallback(event, data); });
   client.connect(websockets_url);
-
+  commandCallback = callback;
 }
 
 WebsocketsClient& Net::ws() {

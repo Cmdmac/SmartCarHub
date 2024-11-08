@@ -1,5 +1,6 @@
 #include "iBeacon.h"
 #include <Arduino.h>
+#include "net.h"
 
 BleCallback::BleCallback() : len(0) {
       
@@ -56,6 +57,25 @@ void iBeaconFinder::find() {
     pBLEScan->setAdvertisedDeviceCallbacks(pBleCallback);
     pBLEScan->setActiveScan(true);
     pBLEScan->start(8, false);  
+}
+
+void iBeaconFinder::reportTask() {
+    // Serial.println("scanIBeacons");
+    find();
+    vector<iBeacon> devices = getDevices();
+    std::stringstream ss;
+    ss << "http://192.168.2.153:3000/locate?";
+    for (int i = 0; i < devices.size(); i++) {
+        ss << "mac" << i + 1 << "=" << devices[i].address << "&rssi" << i + 1 << "=" << devices[i].rssi << "&";
+    }
+    // Serial.println(ss.str().c_str());
+    Net::httpGet(ss.str());
+}
+
+void iBeaconFinder::findAndReportToServer() {
+    // beaconTimer.attach_ms(1000, &iBeaconFinder::searchBeacons, this);
+    // xTaskCreatePinnedToCore(&iBeaconFinder::searchBeacons, "SearchBeaconsTask", 4096, this, 1, NULL, 0);
+// (scanIBeacons, 1000, 0, MILLIS)
 }
 
 vector<iBeacon> iBeaconFinder::getDevices() {

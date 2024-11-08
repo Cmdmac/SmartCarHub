@@ -11,7 +11,7 @@
 #include "Audio.h"
 #include "Camera.h"
 #include "Command.h"
-// #include "Car.h"
+#include "Car.h"
 #include "Motor_TB6612FNG.h"
 #include "UltraSound.h"
 #include <ESP32Servo.h>
@@ -28,37 +28,6 @@ Net net;
 #define I2S_BCLK      41
 #define I2S_LRC       42
 
-void scanIBeacons() {
-  Serial.println("scanIBeacons");
-  finder.find();
-  vector<iBeacon> devices = finder.getDevices();
-  // if (devices.size() >= 3) {
-  //   string mac1 = devices[0].address;
-  //   string mac2 = devices[1].address;
-  //   string mac3 = devices[2].address;
-
-  //   int rssi1 = devices[0].rssi;
-  //   int rssi2 = devices[1].rssi;
-  //   int rssi3 = devices[2].rssi;
-
-    
-  //   std::stringstream ss;
-  //   ss << "http://192.168.2.153:3000/locate?"  << "mac1=" << mac1 << "&mac2=" << mac2 << "&mac3=" << mac3 << "&rssi1=" << rssi1 << "&rssi2=" << rssi2 << "&rssi3=" << rssi3;
-
-  //   Serial.println(ss.str().c_str());
-
-  //   ::httpGet(ss.str());
-  // }
-  std::stringstream ss;
-  ss << "http://192.168.2.153:3000/locate?";
-  for (int i = 0; i < devices.size(); i++) {
-    ss << "mac" << i + 1 << "=" << devices[i].address << "&rssi" << i + 1 << "=" << devices[i].rssi << "&";
-  }
-  // Serial.println(ss.str().c_str());
-  Net::httpGet(ss.str());
-}
-
-  
 QMC5883LCompass compass;
 void compassTask(void* params) {
   // Serial.begin(9600);
@@ -83,9 +52,6 @@ void compassTask(void* params) {
   }
 }
 
-
-// Ticker beaconTimer(scanIBeacons, 1000, 0, MILLIS);
-
 Audio audio; 
 // void audioTask(void* params) {
 //   Audio audio;  
@@ -104,7 +70,7 @@ Motor_TB6612FNG l = Motor_TB6612FNG(17, 18, 16, 8);
 Motor_TB6612FNG r = Motor_TB6612FNG(3, 46, 9, 8);
 // Servo s = Servo(19);
 UltraSound us = UltraSound(7, 15);
-// Car car = Car(&l, &r, &s, &us);
+Car car = Car(&l, &r, /*&s,*/ &us);
 
 #define SERVO_PIN   0
 #define MAX_WIDTH   2500
@@ -138,7 +104,6 @@ void setup() {
   Serial.begin(9600);
   
   // create compass task
-  xTaskCreatePinnedToCore(compassTask, "CompassTask", 4096, NULL, 1, NULL, 0);
   // xTaskCreatePinnedToCore(ultrSoundTask, "ultrSoundTask", 4096, NULL, 1, NULL, 1);
   // xTaskCreatePinnedToCore(servoTask, "servoTask", 2048, NULL, 1, NULL, 1);
 
@@ -147,9 +112,13 @@ void setup() {
 
 
   // init ble,wifi,websocket
-  finder.init();
   net.setUpWifi();
-  net.setUpWebsocket();
+  net.setUpWebsocket([](int cmd) {
+    Serial.println(cmd);
+  });
+
+  // finder.init();
+  // finder.findAndReportToServer();
   // start timeer
   // beaconTimer.start();
 
@@ -211,22 +180,6 @@ void loop() {
 	// 	myservo.write(pos);    // tell servo to go to position in variable 'pos'
 	// 	delay(15);             // waits 15ms for the servo to reach the position
 	// }
-  float speed = l.getSpeed();
-  if (speed >= 1.0) {
-    step = -step;
-  } else if (speed <= 0.3) {
-    step = -step;
-  }
-  speed = speed + step;
-  Serial.println(speed);
-  // r.setSpeed(speed);
-  // r.setSpeed(speed);
-  delay(1000);
-  r.forward();
-  l.forward();
-  delay(1000);
-  l.backward();
-  r.backward();
   // led.flicker();
   // led.autoFade();
 
