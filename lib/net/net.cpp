@@ -28,10 +28,12 @@ const char* websockets_url = "ws://192.168.2.153:3000/mobile/hub"; //Enter serve
 
 
 void Net::onMessageCallback(WebsocketsMessage message) {
-    Serial.print("Got Message: ");
-    Serial.println(message.data());
+    // Serial.print("Got Message: ");
+    String str = message.data();
+    // String str = message.data().substring(2, message.data().length() - 1);
+    // Serial.println(str);
     JsonDocument doc;
-    deserializeJson(doc, message.data());
+    deserializeJson(doc, str.c_str());
     int cmd = doc["command"];
     if (commandCallback != NULL) {
         commandCallback(cmd);
@@ -64,6 +66,8 @@ void Net::setUpWifi() {
 void Net::setUpWebsocket(CommandCallback callback) {
   Serial.begin(9600);
   Serial.println("setup websocket");
+  // client.onMessage(onMessageCallback2);
+
   client.onMessage([&](WebsocketsMessage msg){ onMessageCallback(msg); });
   client.onEvent([&](WebsocketsEvent event, String data) { onEventsCallback(event, data); });
   client.connect(websockets_url);

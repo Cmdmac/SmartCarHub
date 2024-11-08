@@ -106,15 +106,25 @@ void setup() {
   // create compass task
   // xTaskCreatePinnedToCore(ultrSoundTask, "ultrSoundTask", 4096, NULL, 1, NULL, 1);
   // xTaskCreatePinnedToCore(servoTask, "servoTask", 2048, NULL, 1, NULL, 1);
-
-
   // xTaskCreatePinnedToCore(audioTask, "AudioTask", 8192 * 2, NULL, 1, NULL, 0);
-
-
   // init ble,wifi,websocket
   net.setUpWifi();
   net.setUpWebsocket([](int cmd) {
     Serial.println(cmd);
+    switch(cmd) {
+      case CMD_FORWARD:
+        car.forward();
+        break;
+      case CMD_BACKWARD:
+        car.backward();
+        break;
+      case CMD_TURN_LEFT:
+        car.left();
+        break;
+      case CMD_TURN_RIGHT:
+        car.right();
+        break;
+    }
   });
 
   // finder.init();
@@ -140,25 +150,21 @@ void setup() {
   // camera.setUp();
   // camera.startStreamServer();
 
-  ESP32PWM::allocateTimer(0);
-	ESP32PWM::allocateTimer(1);
-	ESP32PWM::allocateTimer(2);
-	ESP32PWM::allocateTimer(3);
-	myservo.setPeriodHertz(50);    // standard 50 hz servo
-	myservo.attach(servoPin, 1000, 2000); // attaches the servo on pin 18 to the servo object
+  // ESP32PWM::allocateTimer(0);
+	// ESP32PWM::allocateTimer(1);
+	// ESP32PWM::allocateTimer(2);
+	// ESP32PWM::allocateTimer(3);
+	// myservo.setPeriodHertz(50);    // standard 50 hz servo
+	// myservo.attach(servoPin, 1000, 2000); // attaches the servo on pin 18 to the servo object
 	// }
 
   // pinMode(servoPin, OUTPUT);
 
-	myservo.write(0);
+	// myservo.write(0);
 
-  led.setFlickerInterval(500);
-  led.setFadeMount(10);
-
-  l.setSpeed(0.5);
-  l.backward();
-  r.backward();
-
+  // led.setFlickerInterval(500);
+  // led.setFadeMount(10);
+  car.setSpeed(0.5);
   // initHall();
 }
 
