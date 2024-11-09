@@ -40,17 +40,18 @@ void Uri::appendPath(std::string path) {
 }
 
 void Uri::appendQuery(std::string key, std::string value) {
-    querys.push_back(key);
-    querys.push_back("=");
-    querys.push_back(value);
+    std::string s;
+    s.append(key).append("=").append(value);
+    querys.push_back(s);
 }
 
 void Uri::appendQuery(std::string key, int value) {
-    querys.push_back(key);
-    querys.push_back("=");
+    std::string s;
+    s.append(key).append("=");
     std::stringstream ss;
     ss << value;
-    querys.push_back(ss.str());
+    s.append(ss.str());
+    querys.push_back(s);
 }
 
 // 打印URI的详细信息
@@ -74,7 +75,7 @@ std::string Uri::toString() {
     ss << path;
     if (querys.size() > 0) {
         ss << "?";
-        for (int i = 0; i < querys.size(); i++) {
+        for (size_t i = 0; i < querys.size(); i++) {
             ss << querys[i];
             if (i < querys.size() - 1) {
                 ss << "&";
