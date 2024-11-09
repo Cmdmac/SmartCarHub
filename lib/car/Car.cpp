@@ -2,7 +2,7 @@
 #include <Arduino.h>
 #include "Command.h"
 
-Car::Car(Motor *l, Motor *r, /*Servo2 *s,*/ UltraSound *us) : l(l), r(r), /*s(s),*/ us(us) {
+Car::Car(Motor *l, Motor *r, /*Servo2 *s,*/ UltraSound *us) : l(l), r(r), /*s(s),*/ us(us), speed(0) {
 
 }
 
@@ -61,6 +61,7 @@ void Car::speedDown() {
 }
 
 void Car::setSpeed(float speed) {
+  this->speed = speed;
   l->setSpeed(speed);
   r->setSpeed(speed);
 }
@@ -83,3 +84,23 @@ void Car::getDistance() {
   this->us->getDistance();
 }
 
+void Car::drive(float speed) {
+  this->speed = speed;
+  loop();
+}
+
+void Car::loop() {
+  float speed = this->speed;
+  if (speed > 0) {
+    l->forward();
+    l->setSpeed(speed);
+    r->setSpeed(speed);
+  } else if (speed < 0) {
+    l->backward();
+    l->setSpeed(-speed);
+    r->setSpeed(-speed);
+  } else if (speed == 0) {
+    l->setSpeed(0);
+    r->setSpeed(0);
+  }
+}

@@ -78,3 +78,4 @@ void Motor::setSpeed(float speed) {
 float Motor::getSpeed() {
   return this->speed;
 }
+

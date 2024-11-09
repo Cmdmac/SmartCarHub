@@ -31,12 +31,12 @@ void Net::onMessageCallback(WebsocketsMessage message) {
     // Serial.print("Got Message: ");
     String str = message.data();
     // String str = message.data().substring(2, message.data().length() - 1);
-    // Serial.println(str);
+    Serial.println(str);
     JsonDocument doc;
     deserializeJson(doc, str.c_str());
     int cmd = doc["command"];
     if (commandCallback != NULL) {
-        commandCallback(cmd);
+        commandCallback(cmd, doc);
     }
 }
 

@@ -27,7 +27,7 @@ void iBeaconTask() {
         uri.appendQuery(buffer , devices[i].rssi);
         ::memset(buffer, 0, 10);
     }
-    Serial.println(uri.toString().c_str());
+    // Serial.println(uri.toString().c_str());
     Net::httpGet(uri.toString());
 }
 

@@ -14,6 +14,7 @@ class Car {
     char data[128] = {0};
     // memset(data, 0, 128);
     int count = 0;
+    float speed;
 
     void parse(char* data, int len);
 
@@ -39,7 +40,8 @@ class Car {
 
     void getDistance();
 
-
+    void drive(float speed);
+    void loop();
 };
 
 #endif

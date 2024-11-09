@@ -89,7 +89,7 @@ void setup() {
   // xTaskCreatePinnedToCore(audioTask, "AudioTask", 8192 * 2, NULL, 1, NULL, 0);
   // init ble,wifi,websocket
   net.setUpWifi();
-  net.setUpWebsocket([](int cmd) {
+  net.setUpWebsocket([](int cmd, JsonDocument doc) {
     Serial.println(cmd);
     switch(cmd) {
       case CMD_FORWARD:
@@ -103,6 +103,10 @@ void setup() {
         break;
       case CMD_TURN_RIGHT:
         car.right();
+        break;
+      case CMD_SET_SPEED:
+        int speed = doc["data"];
+        car.drive(speed);
         break;
     }
   });
@@ -153,6 +157,7 @@ int pos = 0;    // variable to store the servo position
 
 void loop() {
   net.loop();
+  car.loop();
   // beaconTimer.update(); 
   // audio.loop();
   // // delay(15000);

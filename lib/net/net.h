@@ -3,12 +3,13 @@
 #include <HTTPClient.h>
 #include <ArduinoWebsockets.h>
 #include <string>
+#include <ArduinoJson.h>
 using namespace std;
 using namespace websockets;
 
 #define WS_SERVER "http://192.168.2.153:3000"
 
-typedef std::function<void(int)> CommandCallback;
+typedef std::function<void(int, JsonDocument)> CommandCallback;
 class Net {
     public:
         static string httpGet(string url);
