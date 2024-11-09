@@ -91,17 +91,19 @@ void Car::drive(float speed) {
 
 void Car::loop() {
   float speed = this->speed;
-  if (speed > 0) {
+  if (speed > 0.3) {
     l->forward();
     r->forward();
     l->setSpeed(speed);
     r->setSpeed(speed);
-  } else if (speed < 0) {
+  } else if (speed < -0.3) {
     l->backward();
     r->backward();
     l->setSpeed(-speed);
     r->setSpeed(-speed);
   } else if (speed == 0) {
+    l->stop();
+    r->stop();
     l->setSpeed(0);
     r->setSpeed(0);
   }
