@@ -89,7 +89,7 @@ void setup() {
   // xTaskCreatePinnedToCore(audioTask, "AudioTask", 8192 * 2, NULL, 1, NULL, 0);
   // init ble,wifi,websocket
   net.setUpWifi();
-  net.setUpWebsocket([](int cmd, JsonDocument doc) {
+  net.setUpWebsocket([](int cmd, JsonDocument& doc) {
     Serial.println(cmd);
     switch(cmd) {
       case CMD_FORWARD:
@@ -105,7 +105,9 @@ void setup() {
         car.right();
         break;
       case CMD_SET_SPEED:
-        int speed = doc["data"];
+        float speed = doc["data"];
+        Serial.print("speed=");
+        Serial.println(speed);
         car.drive(speed);
         break;
     }

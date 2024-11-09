@@ -9,7 +9,7 @@ using namespace websockets;
 
 #define WS_SERVER "http://192.168.2.153:3000"
 
-typedef std::function<void(int, JsonDocument)> CommandCallback;
+typedef std::function<void(int, JsonDocument&)> CommandCallback;
 class Net {
     public:
         static string httpGet(string url);
