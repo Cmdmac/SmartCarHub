@@ -12,6 +12,9 @@ using namespace std;
 #define CMD_BRAKE 5
 #define CMD_DIRECTION 100
 
+#define PIN_COMPASS_SDA 11
+#define PIN_COMPASS_SCL 10
+
 class CommandBuilder {
     public:
         static string CreateCodeJson(int cmd, int data) {

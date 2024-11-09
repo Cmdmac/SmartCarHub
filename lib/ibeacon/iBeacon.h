@@ -1,4 +1,5 @@
 #ifndef _IBEACON_H
+#define _IBEACON_H
 #include <BLEDevice.h>
 #include <BLEUtils.h>
 #include <BLEServer.h>
@@ -42,12 +43,12 @@ class iBeaconFinder {
             return p1.rssi > p2.rssi;
         }
 
-        static void reportDelegate(iBeaconFinder *pvParameters) {
-          // 将传入的参数转换为类的实例指针
-          iBeaconFinder* instance = static_cast<iBeaconFinder*>(pvParameters);
-          // 调用类的成员函数
-          instance->reportTask();
-        }
+        // static void reportDelegate(iBeaconFinder *pvParameters) {
+        //   // 将传入的参数转换为类的实例指针
+        //   iBeaconFinder* instance = static_cast<iBeaconFinder*>(pvParameters);
+        //   // 调用类的成员函数
+        //   instance->reportTask();
+        // }
 
         static void findDelegate(void *pvParameters) {
           iBeaconFinder* instance = static_cast<iBeaconFinder*>(pvParameters);
@@ -56,14 +57,14 @@ class iBeaconFinder {
           }
         }
 
-        void reportTask();
+        // void reportTask();
 
 
     public:
         iBeaconFinder();
         void init();
         void find();
-        void findAndReportToServer();
+        void startFind();
         vector<iBeacon> getDevices();
         void loop();
 

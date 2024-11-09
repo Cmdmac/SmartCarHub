@@ -2,6 +2,7 @@
 #include "Arduino.h"
 #include "QMC5883LCompass.h"
 #include <Wire.h>
+#include <string>
 
 QMC5883LCompass::QMC5883LCompass() {
 }

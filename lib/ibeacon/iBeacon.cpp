@@ -1,7 +1,5 @@
 #include "iBeacon.h"
 #include <Arduino.h>
-#include "net.h"
-#include "Uri.h"
 
 BleCallback::BleCallback() : len(0) {
       
@@ -60,30 +58,30 @@ void iBeaconFinder::find() {
     pBLEScan->start(8, false);  
 }
 
-void iBeaconFinder::reportTask() {
-    // Serial.println("scanIBeacons");
-    // find();
-    Serial.println("report to server");
-    vector<iBeacon> devices = getDevices();
+// void iBeaconFinder::reportTask() {
+//     // Serial.println("scanIBeacons");
+//     // find();
+//     Serial.println("report to server");
+//     vector<iBeacon> devices = getDevices();
 
-    Uri uri(WS_SERVER);
-    char buffer[10];
+//     Uri uri(WS_SERVER);
+//     char buffer[10];
     
-    uri.appendPath("locate");
-    for (int i = 0; i < devices.size(); i++) {
-        sprintf(buffer, "mac%d", i + 1);
-        uri.appendQuery(buffer ,devices[i].address);
-        ::memset(buffer, 0, 10);
-        sprintf(buffer, "rssi%d", i + 1);
-        uri.appendQuery(buffer , devices[i].rssi);
-        ::memset(buffer, 0, 10);
-    }
-    Serial.println(uri.toString().c_str());
-    Net::httpGet(uri.toString());
-}
+//     uri.appendPath("locate");
+//     for (int i = 0; i < devices.size(); i++) {
+//         sprintf(buffer, "mac%d", i + 1);
+//         uri.appendQuery(buffer ,devices[i].address);
+//         ::memset(buffer, 0, 10);
+//         sprintf(buffer, "rssi%d", i + 1);
+//         uri.appendQuery(buffer , devices[i].rssi);
+//         ::memset(buffer, 0, 10);
+//     }
+//     Serial.println(uri.toString().c_str());
+//     Net::httpGet(uri.toString());
+// }
 
-void iBeaconFinder::findAndReportToServer() {
-    beaconTimer.attach_ms(1000, &iBeaconFinder::reportDelegate, this);
+void iBeaconFinder::startFind() {
+    // beaconTimer.attach_ms(1000, &iBeaconFinder::reportDelegate, this);
     xTaskCreatePinnedToCore(&iBeaconFinder::findDelegate, "findBleTask", 4096, this, 1, NULL, 0);
 }
 

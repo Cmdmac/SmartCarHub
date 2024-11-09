@@ -1,5 +1,5 @@
 #ifndef _QMC5883LCOMPASS_H
-
+#define _QMC5883LCOMPASS_H
 #include "Arduino.h"
 #include "Wire.h"
 

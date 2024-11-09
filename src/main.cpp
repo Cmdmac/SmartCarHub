@@ -16,41 +16,21 @@
 #include "UltraSound.h"
 #include <ESP32Servo.h>
 #include "Led.h"
+#include "DataChannel.h"
 // #include "Hall.h"
 
 using namespace std;
 using namespace websockets;
 
-iBeaconFinder finder;
-Net net;
+
+extern QMC5883LCompass compass;
+extern iBeaconFinder finder;
+extern Net net;
 
 #define I2S_DOUT      40
 #define I2S_BCLK      41
 #define I2S_LRC       42
 
-QMC5883LCompass compass;
-void compassTask(void* params) {
-  // Serial.begin(9600);
-  // Serial.println("test");
-
-  compass.init(11, 10);
-  int a;
-  while(1) {
-    // compassTask(NULL);
-
-    // Read compass values
-    compass.read();
-    // Return Azimuth reading
-    a = compass.getAzimuth() + 180;
-    string s = CommandBuilder::CreateCodeJson(CMD_DIRECTION, a);
-    // Serial.println(s.c_str());
-    net.ws().send(s.c_str());
-    Serial.print("A: ");
-    Serial.print(a);
-    Serial.println();
-    delay(1000);
-  }
-}
 
 Audio audio; 
 // void audioTask(void* params) {
@@ -127,8 +107,8 @@ void setup() {
     }
   });
 
-  finder.init();
-  finder.findAndReportToServer();
+
+  startTasks();
   // start timeer
   // beaconTimer.start();
 
