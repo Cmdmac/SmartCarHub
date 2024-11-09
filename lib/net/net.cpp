@@ -10,8 +10,8 @@ string Net::httpGet(string url) {
     if (httpCode > 0) {
       if (httpCode == HTTP_CODE_OK) {
         String payload = http.getString();
-        Serial.println("Response:");
-        Serial.println(payload);
+        // Serial.println("Response:");
+        // Serial.println(payload);
         return payload.c_str();
       }
     } else {

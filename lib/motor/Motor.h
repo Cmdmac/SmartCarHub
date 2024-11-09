@@ -5,7 +5,7 @@ class Motor {
   int pinPos;
   int pinNeg;
   int pinPwm;
-  float speed = 500;
+  float speed = 0.5;
 
   // public static int SPEED_1 = 100;
   // public static int SPEED_2 = 200;

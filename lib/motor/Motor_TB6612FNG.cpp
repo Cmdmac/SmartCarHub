@@ -11,23 +11,23 @@ Motor_TB6612FNG::Motor_TB6612FNG(int pinPos, int pinNeg, int pinPwm, int pinStby
 
 void Motor_TB6612FNG::forward() {
   
-  Serial.println("forward");
-  Serial.println(this->speed);
+  // Serial.println("forward");
+  // Serial.println(this->speed);
   // Serial.println(this->speed);
   digitalWrite(this->pinStby, HIGH);
 
   digitalWrite(this->pinPos, HIGH);
   digitalWrite(this->pinNeg, LOW);
-  analogWrite(this->pinPwm, this->speed  * 255);  
+  // analogWrite(this->pinPwm, this->speed  * 255);  
 
 }
 
 void Motor_TB6612FNG::backward() {
-  Serial.println("backward");
-  Serial.println(this->speed);
+  // Serial.println("backward");
+  // Serial.println(this->speed);
   digitalWrite(this->pinPos, LOW);
   digitalWrite(this->pinNeg, HIGH);
-  analogWrite(this->pinPwm, this->speed  * 255);  
+  // analogWrite(this->pinPwm, this->speed  * 255);  
 }
 
 void Motor_TB6612FNG::stop() {

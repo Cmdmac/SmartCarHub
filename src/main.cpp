@@ -159,7 +159,9 @@ int pos = 0;    // variable to store the servo position
 
 void loop() {
   net.loop();
+  // car.speedDown();
   car.loop();
+  // delay(1000);
   // beaconTimer.update(); 
   // audio.loop();
   // // delay(15000);

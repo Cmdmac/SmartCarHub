@@ -59,5 +59,5 @@ void startTasks() {
     finder.init();
     finder.startFind();
     compass.init(PIN_COMPASS_SDA, PIN_COMPASS_SCL);
-    xTaskCreatePinnedToCore(reportTask, "reportTask", 4096, NULL, 1, NULL, 1);
+    xTaskCreatePinnedToCore(reportTask, "reportTask", 4096, NULL, 1, NULL, 0);
 }
