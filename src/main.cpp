@@ -150,7 +150,7 @@ void setup() {
 
   // led.setFlickerInterval(500);
   // led.setFadeMount(10);
-  car.setSpeed(0.5);
+  // car.setSpeed(0.5);
   // initHall();
 }
 
