@@ -127,8 +127,8 @@ void setup() {
     }
   });
 
-  // finder.init();
-  // finder.findAndReportToServer();
+  finder.init();
+  finder.findAndReportToServer();
   // start timeer
   // beaconTimer.start();
 
