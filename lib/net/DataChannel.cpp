@@ -12,7 +12,7 @@ QMC5883LCompass compass;
 void iBeaconTask() {
 // Serial.println("scanIBeacons");
     // find();
-    Serial.println("report to server");
+    // Serial.println("report to server");
     vector<iBeacon> devices = finder.getDevices();
 
     Uri uri(WS_SERVER);
@@ -37,12 +37,12 @@ void compassTask() {
     compass.read();
     // Return Azimuth reading
     int a = compass.getAzimuth() + 180;
-    std::string s = CommandBuilder::CreateCodeJson(CMD_DIRECTION, a);
+    std::string s = CommandBuilder::CreateCodeJson(CMD_REPORT_DIRECTION, a);
     // Serial.println(s.c_str());
     net.ws().send(s.c_str());
-    Serial.print("A: ");
-    Serial.print(a);
-    Serial.println();
+    // Serial.print("A: ");
+    // Serial.print(a);
+    // Serial.println();
 }
 
 void reportTask(void* p) {

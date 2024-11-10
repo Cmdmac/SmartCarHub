@@ -2,7 +2,7 @@
 #include <Arduino.h>
 #include "Command.h"
 
-Car::Car(Motor *l, Motor *r, /*Servo2 *s,*/ UltraSound *us) : l(l), r(r), /*s(s),*/ us(us), speed(0) {
+Car::Car(Motor *l, Motor *r, /*Servo2 *s,*/ UltraSound *us) : l(l), r(r), /*s(s),*/ us(us), directValue(0), speed(0) {
 
 }
 
@@ -84,28 +84,49 @@ void Car::getDistance() {
   this->us->getDistance();
 }
 
-void Car::drive(float speed) {
-  this->speed = speed;
-  loop();
+void Car::direct(float d) {
+  this->directValue = d;
+  if (d < 0) {
+    
+  } else if (d > 0) {
+
+  } else {
+    
+  }
+  
 }
 
-void Car::loop() {
-  float speed = this->speed;
+void Car::drive(float speed) {
+  this->speed = speed;
   delay(1);
-  if (speed > 0.2) {
-    l->setSpeed(speed);
-    r->setSpeed(speed);
-    l->forward();
-    r->forward();
-  } else if (speed < -0.2) {
-    l->setSpeed(-speed);
-    r->setSpeed(-speed);
-    l->backward();
-    r->backward();
-  } else if (speed == 0) {
+  if (speed == 0) {
     l->stop();
     r->stop();
     l->setSpeed(0);
     r->setSpeed(0);
-  }
+  } else if (speed > 0.2) {
+    float speedLeft = speed;
+    float speedRight = speed;
+    if (this->directValue > 0) {
+      speedLeft = (1 - this->directValue) * speedLeft;
+    } else if (this->directValue < 0) {
+      speedRight = (1 - (-this->directValue)) * speedRight;
+    }
+    l->setSpeed(speedLeft);
+    r->setSpeed(speedRight);
+    l->forward();
+    r->forward();
+  } else if (speed < -0.2) {
+    float speedLeft = -speed;
+    float speedRight = -speed;
+    if (this->directValue > 0) {
+      speedLeft = (1 - this->directValue) * speedLeft;
+    } else if (this->directValue < 0)  {
+      speedRight = (1 - (-this->directValue)) * speedRight;
+    }
+    l->setSpeed(speedLeft);
+    r->setSpeed(speedRight);
+    l->backward();
+    r->backward();
+  }  
 }

@@ -15,6 +15,7 @@ class Car {
     // memset(data, 0, 128);
     int count = 0;
     float speed;
+    float directValue;
 
     void parse(char* data, int len);
 
@@ -40,8 +41,8 @@ class Car {
 
     void getDistance();
 
+    void direct(float d);
     void drive(float speed);
-    void loop();
 };
 
 #endif

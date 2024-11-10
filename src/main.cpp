@@ -90,25 +90,21 @@ void setup() {
   // init ble,wifi,websocket
   net.setUpWifi();
   net.setUpWebsocket([](int cmd, JsonDocument& doc) {
-    Serial.println(cmd);
+    Serial.print(cmd);
     switch(cmd) {
-      case CMD_FORWARD:
-        car.forward();
+      case CMD_SET_DIRECTION: {
+          float d = doc["data"];
+          Serial.print(" direction=");
+          Serial.println(d);
+          car.direct(d);
+        }
         break;
-      case CMD_BACKWARD:
-        car.backward();
-        break;
-      case CMD_TURN_LEFT:
-        car.left();
-        break;
-      case CMD_TURN_RIGHT:
-        car.right();
-        break;
-      case CMD_SET_SPEED:
-        float speed = doc["data"];
-        Serial.print("speed=");
-        Serial.println(speed);
-        car.drive(speed);
+      case CMD_SET_SPEED: {
+          float speed = doc["data"];
+          Serial.print(" speed=");
+          Serial.println(speed);
+          car.drive(speed);
+        }
         break;
     }
   });
@@ -160,7 +156,6 @@ int pos = 0;    // variable to store the servo position
 void loop() {
   net.loop();
   // car.speedDown();
-  car.loop();
   // delay(1000);
   // beaconTimer.update(); 
   // audio.loop();
