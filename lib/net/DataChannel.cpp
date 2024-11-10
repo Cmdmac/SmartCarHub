@@ -15,20 +15,31 @@ void iBeaconTask() {
     // Serial.println("report to server");
     vector<iBeacon> devices = finder.getDevices();
 
-    Uri uri(WS_SERVER);
+    // Uri uri(WS_SERVER);
     char buffer[10];
     
-    uri.appendPath("locate");
+    // uri.appendPath("locate");
+
+    JsonDocument doc;
     for (int i = 0; i < devices.size(); i++) {
         sprintf(buffer, "mac%d", i + 1);
-        uri.appendQuery(buffer ,devices[i].address);
+        doc[buffer] = devices[i].address;
+        // uri.appendQuery(buffer ,devices[i].address);
         ::memset(buffer, 0, 10);
         sprintf(buffer, "rssi%d", i + 1);
-        uri.appendQuery(buffer , devices[i].rssi);
+        doc[buffer] = devices[i].rssi;
+        // uri.appendQuery(buffer , devices[i].rssi);
         ::memset(buffer, 0, 10);
     }
+
+
+    std::string str;
+    serializeJson(doc, str);
     // Serial.println(uri.toString().c_str());
-    Net::httpGet(uri.toString());
+    std::string s = CommandBuilder::CreateCodeJson(CMD_REPORT_LOCATION, str);
+    // Net::httpGet(uri.toString());
+    // Serial.println(s.c_str());
+    net.ws().send(s.c_str());
 }
 
 void compassTask() {
