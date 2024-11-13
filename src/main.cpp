@@ -27,22 +27,24 @@ extern QMC5883LCompass compass;
 extern iBeaconFinder finder;
 extern Net net;
 
-#define I2S_DOUT      40
-#define I2S_BCLK      41
-#define I2S_LRC       42
+#define I2S_DOUT      15
+#define I2S_BCLK      16
+#define I2S_LRC       17
 
 
-Audio audio; 
-// void audioTask(void* params) {
-//   Audio audio;  
-//   audio.setPinout(I2S_BCLK, I2S_LRC, I2S_DOUT);
-//   audio.setVolume(10); // 0...21
-//   while(1) {
-//     audio.connecttohost("http://192.168.1.4:3000/voice2.mp3");
-//     audio.loop();
-//     delay(15000);
-//   }
-// }
+// Audio audio; 
+void audioTask(void* params) {
+  Audio audio;  
+  audio.setPinout(I2S_BCLK, I2S_LRC, I2S_DOUT);
+  audio.setVolume(18); // 0...21
+  //连接网络不能放在死循环中,loop一次就会播放一次
+  audio.connecttohost("http://192.168.2.153:4000/voice.mp3");
+
+  while(1) {
+    audio.loop();
+    // delay(15000);
+  }
+}
 Camera camera;
 
 Motor_TB6612FNG l = Motor_TB6612FNG(17, 18, 16, 8);
@@ -86,7 +88,6 @@ void setup() {
   // create compass task
   // xTaskCreatePinnedToCore(ultrSoundTask, "ultrSoundTask", 4096, NULL, 1, NULL, 1);
   // xTaskCreatePinnedToCore(servoTask, "servoTask", 2048, NULL, 1, NULL, 1);
-  // xTaskCreatePinnedToCore(audioTask, "AudioTask", 8192 * 2, NULL, 1, NULL, 0);
   // init ble,wifi,websocket
   net.setUpWifi();
   net.setUpWebsocket([](int cmd, JsonDocument& doc) {
@@ -109,6 +110,7 @@ void setup() {
     }
   });
 
+  xTaskCreatePinnedToCore(audioTask, "AudioTask", 8192 * 2, NULL, 1, NULL, 0);
 
   startTasks();
   // start timeer
@@ -127,7 +129,7 @@ void setup() {
 
   // audio.setPinout(I2S_BCLK, I2S_LRC, I2S_DOUT);
   // audio.setVolume(18); // 0...21
-  // audio.connecttohost("http://192.168.1.4:3000/voice.mp3");
+  // audio.connecttohost("http://192.168.2.153:4000/voice2.mp3");
 
   // camera.setUp();
   // camera.startStreamServer();
