@@ -18,6 +18,8 @@
 #include "Led.h"
 #include "DataChannel.h"
 // #include "Hall.h"
+#include "AudioRecorder.h"
+#include "SPIFFSServer.h"
 
 using namespace std;
 using namespace websockets;
@@ -26,6 +28,8 @@ using namespace websockets;
 extern QMC5883LCompass compass;
 extern iBeaconFinder finder;
 extern Net net;
+
+SPIFFSServer fileWebServer;
 
 #define I2S_DOUT      15
 #define I2S_BCLK      16
@@ -84,11 +88,7 @@ extern void initHall();
 Led led = Led(14);
 void setup() {
   Serial.begin(9600);
-  
-  // create compass task
-  // xTaskCreatePinnedToCore(ultrSoundTask, "ultrSoundTask", 4096, NULL, 1, NULL, 1);
-  // xTaskCreatePinnedToCore(servoTask, "servoTask", 2048, NULL, 1, NULL, 1);
-  // init ble,wifi,websocket
+
   net.setUpWifi();
   net.setUpWebsocket([](int cmd, JsonDocument& doc) {
     Serial.print(cmd);
@@ -110,9 +110,11 @@ void setup() {
     }
   });
 
-  xTaskCreatePinnedToCore(audioTask, "AudioTask", 8192 * 2, NULL, 1, NULL, 0);
+  // xTaskCreatePinnedToCore(audioTask, "AudioTask", 8192 * 2, NULL, 1, NULL, 0);
 
-  startTasks();
+  // startTasks();
+
+  fileWebServer.setup();
   // start timeer
   // beaconTimer.start();
 
@@ -157,6 +159,7 @@ int pos = 0;    // variable to store the servo position
 
 void loop() {
   net.loop();
+  fileWebServer.loop();
   // car.speedDown();
   // delay(1000);
   // beaconTimer.update(); 
