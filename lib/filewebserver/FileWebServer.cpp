@@ -2,6 +2,7 @@
 
 #include <SPIFFS.h>
 #include "esp_spiffs.h"
+#include <sstream>
 
 void FileWebServer::returnOK() {
   server.send(200, "text/plain", "");
@@ -11,6 +12,21 @@ void FileWebServer::returnFail(String msg) {
   server.send(500, "text/plain", msg + "\r\n");
 }
 
+void FileWebServer::return404() {
+  String message = "Error \n\n";
+  message += "URI: ";
+  message += server.uri();
+  message += "\nMethod: ";
+  message += (server.method() == HTTP_GET) ? "GET" : "POST";
+  message += "\nArguments: ";
+  message += server.args();
+  message += "\n";
+  for (uint8_t i = 0; i < server.args(); i++) {
+    message += " NAME:" + server.argName(i) + "\n VALUE:" + server.arg(i) + "\n";
+  }
+  server.send(404, "text/plain", message);
+  Serial.print(message);
+}
 
 void FileWebServer::handleFileUpload() {
 
@@ -167,25 +183,10 @@ void FileWebServer::handleIndex() {
 }
 
 void FileWebServer::handleNotFound() {
-//   if (hasSD && loadFromSdCard(server.uri())) {
-//     return;
-//   }
   if (loadFile(server.uri().c_str())) {
     return;
   }
-  String message = "Error \n\n";
-  message += "URI: ";
-  message += server.uri();
-  message += "\nMethod: ";
-  message += (server.method() == HTTP_GET) ? "GET" : "POST";
-  message += "\nArguments: ";
-  message += server.args();
-  message += "\n";
-  for (uint8_t i = 0; i < server.args(); i++) {
-    message += " NAME:" + server.argName(i) + "\n VALUE:" + server.arg(i) + "\n";
-  }
-  server.send(404, "text/plain", message);
-  Serial.print(message);
+  return404();
 }
 
 void FileWebServer::handleCreateFolder() {
@@ -206,6 +207,35 @@ void FileWebServer::handleCreateFolder() {
   } else {
     server.send(500, "text/json", "{\"code\":0}");
   }
+}
+
+void FileWebServer::handleDownloadFile() {
+  if (!server.hasArg("path")) {
+    return returnFail("BAD ARGS");
+  }
+    
+  String path = server.arg(0);
+
+  File dataFile = open(path.c_str());
+  if (dataFile.isDirectory()) {
+    return404();
+  }
+
+  if (!dataFile) {
+      return404();
+  }
+
+  std::stringstream ss;
+  
+  ss << "attachment;filename=" << dataFile.name();
+
+  server.sendHeader("Content-Disposition", ss.str().c_str());
+  if (server.streamFile(dataFile, "application/octet-stream") != dataFile.size()) {
+      Serial.println("Sent less data than expected!");
+      returnFail("Sent less data than expected!");
+  }
+
+  dataFile.close();
 }
 
 bool FileWebServer::loadFile(const char* path) {
@@ -265,7 +295,7 @@ bool FileWebServer::loadFile(const char* path) {
 void FileWebServer::setup(void) {
 
   if (MDNS.begin(HOST)) {
-    MDNS.addService("http", "tcp", SDWEBSERVER_PORT);
+    MDNS.addService("http", "tcp", FILEWEBSERVER_PORT);
     Serial.println("MDNS responder started");
     Serial.print("You can now connect to sdwebserver http://");
     Serial.print(HOST);
@@ -278,10 +308,11 @@ void FileWebServer::setup(void) {
   server.on("/edit", HTTP_PUT, [&]() { handleCreate(); });
   server.on("/upload", HTTP_POST, [&]() { returnOK(); }, [&]() { handleFileUpload(); });
   server.on("/createFolder", HTTP_POST, [&]() { handleCreateFolder(); });
+  server.on("/download", HTTP_GET, [&]() { handleDownloadFile(); });
   server.onNotFound([&]() { handleNotFound(); });
 
-  server.begin(SDWEBSERVER_PORT);
-  Serial.println("SD WebServer server started");
+  server.begin(FILEWEBSERVER_PORT);
+  Serial.println("FileWebServer started");
 
     // if (SD.begin(21)) {
     //     Serial.println("SD Card initialized.");
