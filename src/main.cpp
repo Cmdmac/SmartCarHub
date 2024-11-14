@@ -30,6 +30,7 @@ extern iBeaconFinder finder;
 extern Net net;
 
 SPIFFSServer fileWebServer;
+AudioRecorder mic;
 
 #define I2S_DOUT      15
 #define I2S_BCLK      16
@@ -115,6 +116,9 @@ void setup() {
   // startTasks();
 
   fileWebServer.setup();
+
+  mic.setup(-1, -1, -1);
+  mic.recordWav("", 20, SAMPLE_RATE, SAMPLE_BITS);
   // start timeer
   // beaconTimer.start();
 
