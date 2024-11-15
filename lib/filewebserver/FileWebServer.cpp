@@ -1,6 +1,7 @@
 #include "FileWebServer.h"
 
 #include <SPIFFS.h>
+#include <FS.h>
 #include "esp_spiffs.h"
 #include <sstream>
 
@@ -324,10 +325,13 @@ void FileWebServer::setup(void) {
         return;
     }
 
-    // size_t total = 0, used = 0;
-    // esp_spiffs_info("", &total, &used);
-    // printf("Flash chip size: %d\n", total);
-    // printf("Used size: %d\n", used);
+    size_t totalBytes = getFsTotalBytes();
+    size_t usedBytes = getFsTotalBytes();
+    Serial.print("总大小: ");
+    Serial.print(totalBytes);
+    Serial.print("字节 ");
+    Serial.print("已用：");
+    Serial.println(usedBytes);
 
     File file = SPIFFS.open("/index.htm", "r");
     if (!file) {

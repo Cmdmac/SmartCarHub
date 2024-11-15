@@ -8,6 +8,16 @@ class SPIFFSServer : public FileWebServer
 {
 private:
     /* data */
+
+
+    size_t getFsTotalBytes() override {
+        return SPIFFS.totalBytes();
+    }
+
+    size_t getFsUsedBytes() override {
+        return SPIFFS.usedBytes();
+    }
+
     File open(const char* path, const char* mode = FILE_READ) override {
         return SPIFFS.open(path, mode);
     }

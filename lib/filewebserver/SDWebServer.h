@@ -11,6 +11,13 @@ class SDWebServer : public FileWebServer
 private:
     /* data */
 
+    size_t getFsTotalBytes() override {
+        return SD.totalBytes();
+    }
+
+    size_t getFsUsedBytes() override {
+        return SD.usedBytes();
+    }
 
     File open(const char* path, const char* mode = FILE_READ) override {
         return SD.open(path, mode);

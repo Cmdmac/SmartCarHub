@@ -16,6 +16,9 @@ class FileWebServer {
         WebServer server;
         std::string spiffsIndexFileStr;
 
+        virtual size_t getFsTotalBytes() = 0;
+        virtual size_t getFsUsedBytes() = 0;
+
         void returnOK();
         void returnFail(String msg);
         void return404();
