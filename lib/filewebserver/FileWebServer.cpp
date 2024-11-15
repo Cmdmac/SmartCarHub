@@ -326,7 +326,7 @@ void FileWebServer::setup(void) {
     }
 
     size_t totalBytes = getFsTotalBytes();
-    size_t usedBytes = getFsTotalBytes();
+    size_t usedBytes = getFsUsedBytes();
     Serial.print("总大小: ");
     Serial.print(totalBytes);
     Serial.print("字节 ");
@@ -346,6 +346,27 @@ void FileWebServer::setup(void) {
         this->spiffsIndexFileStr.append(s);
         memset(buffer, 0, 128);
     }
+    int index = this->spiffsIndexFileStr.find("{{%total%}}");
+    Serial.println(index);
+    if (index != std::string::npos) {
+      char buffer[10];
+      memset(buffer, 0, 10);
+      sprintf(buffer, "%.2lf", (float)totalBytes / 1024 / 1024);
+      spiffsIndexFileStr = spiffsIndexFileStr.replace(index, strlen("{{%total%}}"), buffer);   
+    } else {
+      Serial.println(index);
+    }
+
+    index = this->spiffsIndexFileStr.find("{{%used%}}");
+    if (index != std::string::npos) {
+      char buffer[10];
+      memset(buffer, 0, 10);
+      sprintf(buffer, "%.2lf", (float)usedBytes / 1024 / 1024);
+      spiffsIndexFileStr = spiffsIndexFileStr.replace(index, strlen("{{%used%}}"), buffer);
+    } else {
+      Serial.println("not found string");
+    }
+    // Serial.println(spiffsIndexFileStr.c_str());
 
 }
 

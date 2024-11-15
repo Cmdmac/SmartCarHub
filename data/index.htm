@@ -67,7 +67,7 @@
             width: 100%;
             display: flex;
             flex-direction: row;
-
+            align-items: center;
         }
         #current-path {
             font-size: 28px;
@@ -81,6 +81,7 @@
         }
 
         #upload-button {
+            margin-left: 10px;
             margin-right: 10px;
         }
 
@@ -102,6 +103,7 @@
     </header>
      <div id="path-actions">
             <div id="current-path"></div>
+            <span>总大小：{{%total%}}M，已使用：{{%used%}}M</span>
             <button id="upload-button">上传</button>
             <input type="file" id="real-upload-button" style="display: none;"/>
             <button id="create-folder" >创建目录</button>
@@ -273,7 +275,7 @@
                         fetch(window.location.href + "delete", {
                             method: 'POST', headers: {
                             'Content-Type': 'application/x-www-form-urlencoded'
-                            }, body: "path=" + getCurrentPath() + '/' + item.name
+                            }, body: "path=" + getCurrentPath() + item.name
                         })
                         .then(data => {
                             updateUi(getCurrentPath());
