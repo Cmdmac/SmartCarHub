@@ -18,7 +18,7 @@
 #include "Led.h"
 #include "DataChannel.h"
 // #include "Hall.h"
-#include "AudioRecorder.h"
+#include "Mic.h"
 #include "SPIFFSServer.h"
 
 using namespace std;
@@ -30,7 +30,7 @@ extern iBeaconFinder finder;
 extern Net net;
 
 SPIFFSServer fileWebServer;
-AudioRecorder mic;
+Mic mic;
 
 #define I2S_DOUT      15
 #define I2S_BCLK      16
@@ -41,12 +41,13 @@ AudioRecorder mic;
 void audioTask(void* params) {
   Audio audio;  
   audio.setPinout(I2S_BCLK, I2S_LRC, I2S_DOUT);
-  audio.setVolume(18); // 0...21
-  //连接网络不能放在死循环中,loop一次就会播放一次
+  audio.setVolume(21); // 0...21
+  //连接网络不能放在死循环中
   audio.connecttohost("http://192.168.2.153:4000/voice.mp3");
 
   while(1) {
     audio.loop();
+    delay(1);
     // delay(15000);
   }
 }
@@ -119,6 +120,7 @@ void setup() {
 
   mic.setup(-1, -1, -1);
   mic.recordWav("", 20, SAMPLE_RATE, SAMPLE_BITS);
+
   // start timeer
   // beaconTimer.start();
 

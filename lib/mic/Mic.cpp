@@ -1,4 +1,4 @@
-#include "AudioRecorder.h"
+#include "Mic.h"
 
 // #include <Arduino.h>
 // #include <I2S.h>
@@ -15,7 +15,7 @@ extern Net net;
 
 int16_t sBuffer[bufferLen];  // 音频数据缓冲区
 
-void AudioRecorder::setup(int pinWS, int pinSD, int pinSCK) {
+void Mic::setup(int pinWS, int pinSD, int pinSCK) {
     Serial.println("AudioRecorder Setup I2S...");
 
     // Serial.begin(115200);
@@ -45,7 +45,7 @@ void AudioRecorder::setup(int pinWS, int pinSD, int pinSCK) {
 
 }
 
-void AudioRecorder::recordWav(const char *url, int recordTime, int sampleRate, int sampleBits)
+void Mic::recordWav(const char *url, int recordTime, int sampleRate, int sampleBits)
 {
     // if (!I2S.begin(PDM_MONO_MODE, sampleRate, sampleBits))
     // {
@@ -57,11 +57,12 @@ void AudioRecorder::recordWav(const char *url, int recordTime, int sampleRate, i
     uint8_t *rec_buffer = NULL;
     Serial.printf("Ready to start recording ...\n");
 
-    if (!SPIFFS.begin()) {
-        return;
+    if (!SPIFFS.begin())
+    {
+      return;
     }
-    
-    File file = SPIFFS.open("/voice.wav", FILE_WRITE);
+
+    File file = SPIFFS.open("/test2.wav", FILE_WRITE);
     // Write the header to the WAV file
     uint8_t wav_header[WAV_HEADER_SIZE];
     generateWavHeader(wav_header, record_size, sampleRate);
@@ -71,8 +72,8 @@ void AudioRecorder::recordWav(const char *url, int recordTime, int sampleRate, i
     rec_buffer = (uint8_t *)ps_malloc(record_size);
     if (rec_buffer == NULL)
     {
-    Serial.printf("malloc failed!\n");
-    while (1)
+      Serial.printf("malloc failed!\n");
+      while (1)
         ;
     }
     Serial.printf("Buffer: %d bytes\n", ESP.getPsramSize() - ESP.getFreePsram());
@@ -81,30 +82,30 @@ void AudioRecorder::recordWav(const char *url, int recordTime, int sampleRate, i
     i2s_read(I2S_NUM_0, rec_buffer, record_size, &sample_size, portMAX_DELAY);
     if (sample_size == 0)
     {
-    Serial.printf("Record Failed!\n");
+      Serial.printf("Record Failed!\n");
     }
     else
     {
-    Serial.printf("Record %d bytes\n", sample_size);
+      Serial.printf("Record %d bytes\n", sample_size);
     }
 
     // Increase volume
     for (uint32_t i = 0; i < sample_size; i += sampleBits / 8)
     {
-    (*(uint16_t *)(rec_buffer + i)) <<= VOLUME_GAIN;
+      (*(uint16_t *)(rec_buffer + i)) <<= VOLUME_GAIN;
     }
 
     // Write data to the WAV file
     Serial.printf("Writing to the file ...\n");
     if (file.write(rec_buffer, record_size) != record_size)
-    Serial.printf("Write file Failed!\n");
+      Serial.printf("Write file Failed!\n");
 
     free(rec_buffer);
     file.close();
     Serial.printf("The recording is over.\n");
 }
 
-void AudioRecorder::generateWavHeader(uint8_t *wav_header, uint32_t wav_size, uint32_t sample_rate)
+void Mic::generateWavHeader(uint8_t *wav_header, uint32_t wav_size, uint32_t sample_rate)
 {
   // See this for reference: http://soundfile.sapp.org/doc/WaveFormat/
   uint32_t file_size = wav_size + WAV_HEADER_SIZE - 8;
@@ -127,7 +128,7 @@ void AudioRecorder::generateWavHeader(uint8_t *wav_header, uint32_t wav_size, ui
   memcpy(wav_header, set_wav_header, sizeof(set_wav_header));
 }
 
-void AudioRecorder::loop() {
+void Mic::loop() {
 //   size_t bytesRead = 0;
 //   esp_err_t result = i2s_read(I2S_PORT, sBuffer, bufferLen * sizeof(int16_t), &bytesRead, portMAX_DELAY);
 //   if (result == ESP_OK && bytesRead > 0) {
