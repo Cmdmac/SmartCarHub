@@ -100,13 +100,13 @@ void setup() {
 
   // startTasks();
 
-  fileWebServer.setup();
+  // fileWebServer.setup();
   // analogMic.setup();
   // analogMic.record("/analogvoice.wav", 5);
 
   // mic.setup(-1, -1, -1);
   // mic.recordWav("", 20, SAMPLE_RATE, SAMPLE_BITS);
-
+  speaker.setup();
   speaker.play("http://192.168.2.153:4000/voice.mp3");
 
   // camera.setUp();
@@ -136,7 +136,7 @@ int pos = 0;    // variable to store the servo position
 void loop() {
   net.loop();
   fileWebServer.loop();
-  speaker.loop();
+  // speaker.loop();
   // car.speedDown();
   // delay(1000);
   // beaconTimer.update(); 

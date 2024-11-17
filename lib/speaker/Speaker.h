@@ -10,6 +10,7 @@ class Speaker {
           Speaker* instance = static_cast<Speaker*>(pvParameters);
           while(1) {
             instance->loop();
+            delay(1);
           }
         }
 
