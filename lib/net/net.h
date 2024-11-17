@@ -1,9 +1,11 @@
 #ifndef _NET_H_
 #define _NET_H_
+#include <Arduino.h>
 #include <HTTPClient.h>
 #include <ArduinoWebsockets.h>
 #include <string>
 #include <ArduinoJson.h>
+#include <stdint.h>
 using namespace std;
 using namespace websockets;
 

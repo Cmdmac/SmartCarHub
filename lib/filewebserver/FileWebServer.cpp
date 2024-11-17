@@ -300,7 +300,9 @@ void FileWebServer::setup(void) {
     Serial.println("MDNS responder started");
     Serial.print("You can now connect to sdwebserver http://");
     Serial.print(HOST);
-    Serial.println(".local");
+    Serial.print(".local:");
+    Serial.print(FILEWEBSERVER_PORT);
+    Serial.println();
   }
   
   server.on("/", HTTP_GET, [&]() { handleIndex(); });

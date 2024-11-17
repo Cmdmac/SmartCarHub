@@ -60,7 +60,8 @@ void Net::setUpWifi() {
     Serial.println("Connecting to WiFi...");
   }
 
-  Serial.println("Connected to WiFi");
+  Serial.println("Connected to WiFi localIP:");
+  Serial.println(WiFi.localIP());
 }
 
 void Net::setUpWebsocket(CommandCallback callback) {
