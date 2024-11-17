@@ -20,6 +20,8 @@
 // #include "Hall.h"
 #include "Mic.h"
 #include "SPIFFSServer.h"
+#include "AnalogMic.h"
+#include "Speaker.h"
 
 using namespace std;
 using namespace websockets;
@@ -32,25 +34,7 @@ extern Net net;
 SPIFFSServer fileWebServer;
 Mic mic;
 
-#define I2S_DOUT      15
-#define I2S_BCLK      16
-#define I2S_LRC       17
-
-
-// Audio audio; 
-void audioTask(void* params) {
-  Audio audio;  
-  audio.setPinout(I2S_BCLK, I2S_LRC, I2S_DOUT);
-  audio.setVolume(21); // 0...21
-  //连接网络不能放在死循环中
-  audio.connecttohost("http://192.168.2.153:4000/voice.mp3");
-
-  while(1) {
-    audio.loop();
-    delay(1);
-    // delay(15000);
-  }
-}
+Speaker speaker; 
 Camera camera;
 
 Motor_TB6612FNG l = Motor_TB6612FNG(17, 18, 16, 8);
@@ -88,6 +72,8 @@ void ultrSoundTask(void* params) {
 extern void initHall();
 
 Led led = Led(14);
+
+AnalogMic analogMic;
 void setup() {
   Serial.begin(9600);
 
@@ -112,32 +98,16 @@ void setup() {
     }
   });
 
-  // xTaskCreatePinnedToCore(audioTask, "AudioTask", 8192 * 2, NULL, 1, NULL, 0);
-
   // startTasks();
 
   fileWebServer.setup();
+  // analogMic.setup();
+  // analogMic.record("/analogvoice.wav", 5);
 
-  mic.setup(-1, -1, -1);
-  mic.recordWav("", 20, SAMPLE_RATE, SAMPLE_BITS);
+  // mic.setup(-1, -1, -1);
+  // mic.recordWav("", 20, SAMPLE_RATE, SAMPLE_BITS);
 
-  // start timeer
-  // beaconTimer.start();
-
-  // WiFi.begin("Stark", "fengzhiping,1101");
-
-  // Serial.println("Connecting to WiFi...");
-  // while (WiFi.status()!= WL_CONNECTED) {
-  //   delay(1000);
-  //   Serial.println(".");
-  // }
-  // Serial.print("Camera Ready! Use 'http://");
-  // Serial.print(WiFi.localIP());
-  // Serial.println("' to connect");
-
-  // audio.setPinout(I2S_BCLK, I2S_LRC, I2S_DOUT);
-  // audio.setVolume(18); // 0...21
-  // audio.connecttohost("http://192.168.2.153:4000/voice2.mp3");
+  speaker.play("http://192.168.2.153:4000/voice.mp3");
 
   // camera.setUp();
   // camera.startStreamServer();
@@ -166,6 +136,7 @@ int pos = 0;    // variable to store the servo position
 void loop() {
   net.loop();
   fileWebServer.loop();
+  speaker.loop();
   // car.speedDown();
   // delay(1000);
   // beaconTimer.update(); 
