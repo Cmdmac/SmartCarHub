@@ -1,7 +1,15 @@
 #include "Led.h"
 #include <Arduino.h>
 
+Led::Led(): mBrightness(0), mFadeMount(10){
+
+}
+
 Led::Led(int pin) : mPin(pin), mBrightness(0), mFadeMount(10) {
+    pinMode(pin, OUTPUT);
+}
+
+void Led::setUp(int pin) {
     pinMode(pin, OUTPUT);
 }
 

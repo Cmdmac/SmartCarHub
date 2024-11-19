@@ -2,7 +2,9 @@
 
 class Led {
     public:
+        Led();
         Led(int pin);
+        void setUp(int pin);
         void on();
         void off();
         void setFlickerInterval(int interval);
