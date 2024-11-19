@@ -60,7 +60,7 @@ void Net::setUpWifi() {
     Serial.println("Connecting to WiFi...");
   }
 
-  Serial.print("Connected to WiFi localIP:");
+  Serial.print("Connected to WiFi localIP: ");
   Serial.println(WiFi.localIP());
 }
 

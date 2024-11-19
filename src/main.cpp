@@ -60,18 +60,10 @@ void ultrSoundTask(void* params) {
   
 }
 
-// void servoTask(void* params) {
-//   s.to(45);
-//   delay(1000);
-//   s.to(90);
-//   delay(1000);
-//   s.to(120);
-//   delay(1000);
-// }
 #include "Hall.h"
 extern void initHall();
 
-Led led = Led(14);
+Led led = Led();
 
 AnalogMic analogMic;
 void setup() {
@@ -106,11 +98,12 @@ void setup() {
 
   // mic.setup(-1, -1, -1);
   // mic.recordWav("", 20, SAMPLE_RATE, SAMPLE_BITS);
+
+  camera.setUp();
+  camera.startStreamServer();
+
   speaker.setup();
   speaker.play("http://192.168.2.153:4000/voice.mp3");
-
-  // camera.setUp();
-  // camera.startStreamServer();
 
   // ESP32PWM::allocateTimer(0);
 	// ESP32PWM::allocateTimer(1);
@@ -128,6 +121,7 @@ void setup() {
   // led.setFadeMount(10);
   // car.setSpeed(0.5);
   // initHall();
+  // led.setUp(35);
 }
 
 float step = 0.1;
@@ -135,7 +129,7 @@ int pos = 0;    // variable to store the servo position
 
 void loop() {
   net.loop();
-  fileWebServer.loop();
+  // fileWebServer.loop();
   // speaker.loop();
   // car.speedDown();
   // delay(1000);
