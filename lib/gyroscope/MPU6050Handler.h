@@ -20,7 +20,7 @@ class MPU6050Handler {
             Serial.println("Initializing MPU...");
             mpu.initialize();
             Serial.println("Testing MPU6050 connection...");
-            if(mpu.testConnection() ==  false){
+            if(mpu.testConnection() ==  false){ 
                 Serial.println("MPU6050 connection failed");
                 while(true);
             }
