@@ -23,6 +23,7 @@
 #include "AnalogMic.h"
 #include "Speaker.h"
 
+
 using namespace std;
 using namespace websockets;
 
@@ -66,6 +67,24 @@ extern void initHall();
 Led led = Led();
 
 AnalogMic analogMic;
+
+// MPU control/status vars
+bool dmpReady = false;
+uint8_t mpuIntStatus;
+uint8_t devStatus;
+uint16_t packetSize;
+uint16_t fifoCount;
+uint8_t fifoBuffer[64];
+
+// orientation/motion vars
+Quaternion q;
+VectorInt16 aa;
+VectorInt16 aaReal;
+VectorInt16 aaWorld;
+VectorFloat gravity;
+float euler[3];
+float ypr[3];
+
 void setup() {
   Serial.begin(9600);
 
@@ -99,29 +118,19 @@ void setup() {
   // mic.setup(-1, -1, -1);
   // mic.recordWav("", 20, SAMPLE_RATE, SAMPLE_BITS);
 
-  camera.setUp();
-  camera.startStreamServer();
+  // camera.setUp();
+  // camera.startStreamServer();
 
-  speaker.setup();
-  speaker.play("http://192.168.2.153:4000/voice.mp3");
-
-  // ESP32PWM::allocateTimer(0);
-	// ESP32PWM::allocateTimer(1);
-	// ESP32PWM::allocateTimer(2);
-	// ESP32PWM::allocateTimer(3);
-	// myservo.setPeriodHertz(50);    // standard 50 hz servo
-	// myservo.attach(servoPin, 1000, 2000); // attaches the servo on pin 18 to the servo object
-	// }
-
-  // pinMode(servoPin, OUTPUT);
-
-	// myservo.write(0);
+  // speaker.setup();
+  // speaker.play("http://192.168.2.153:4000/voice.mp3")
 
   // led.setFlickerInterval(500);
   // led.setFadeMount(10);
   // car.setSpeed(0.5);
   // initHall();
-  // led.setUp(35);
+  led.setUp(0);
+
+  
 }
 
 float step = 0.1;
@@ -146,8 +155,8 @@ void loop() {
 	// 	myservo.write(pos);    // tell servo to go to position in variable 'pos'
 	// 	delay(15);             // waits 15ms for the servo to reach the position
 	// }
-  // led.flicker();
+  led.flicker();
   // led.autoFade();
 
-
+  
 }
