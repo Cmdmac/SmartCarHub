@@ -1,11 +1,11 @@
 #include "Led.h"
 #include <Arduino.h>
 
-Led::Led(): mBrightness(0), mFadeMount(10){
+Led::Led(): mBrightness(0), mFadeMount(10), mFlickerInterval(500) {
 
 }
 
-Led::Led(int pin) : mPin(pin), mBrightness(0), mFadeMount(10) {
+Led::Led(int pin) : mPin(pin), mBrightness(0), mFadeMount(10), mFlickerInterval(500) {
     pinMode(pin, OUTPUT);
 }
 

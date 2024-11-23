@@ -55,11 +55,12 @@ void Net::onEventsCallback(WebsocketsEvent event, String data) {
 void Net::setUpWifi() {
   WiFi.begin(ssid, password);
 
+  Serial.print("Connecting to WiFi ...");
   while (WiFi.status()!= WL_CONNECTED) {
     delay(1000);
-    Serial.println("Connecting to WiFi...");
+    Serial.print(".");
   }
-
+  Serial.println();
   Serial.print("Connected to WiFi localIP: ");
   Serial.println(WiFi.localIP());
 }
