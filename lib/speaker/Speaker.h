@@ -13,11 +13,11 @@ class Speaker {
             delay(1);
           }
         }
-
+        void loop();
     public:
         void setup();
         void play(const char* source);
-        void loop();
+
 
 };
 

@@ -4,6 +4,7 @@
 #include <FS.h>
 #include "esp_spiffs.h"
 #include <sstream>
+#include <SD.h>
 
 void FileWebServer::returnOK() {
   server.send(200, "text/plain", "");
@@ -131,32 +132,34 @@ void FileWebServer::handleCreate() {
 }
 
 void FileWebServer::printDirectory() {
+    Serial.println("printDirectory");
   if (!server.hasArg("dir")) {
     return returnFail("BAD ARGS");
   }
-  String path = server.arg("dir");
+
+  String path = server.arg(0);
+  Serial.println("list path=" + path);
   if (path != "/" && !fileExists((char *)path.c_str())) {
     return returnFail("BAD PATH");
   }
-  File dir = open(path.c_str());
-  SPIFFS.open((char *)path.c_str());
-  path = String();
+
+  File dir = SD.open(path.c_str());//open(path.c_str());
   if (!dir.isDirectory()) {
     dir.close();
     return returnFail("NOT DIR");
   }
-  dir.rewindDirectory();
-  server.setContentLength(CONTENT_LENGTH_UNKNOWN);
-  server.send(200, "text/json", "");
 
-  server.sendContent("[");
+  dir.rewindDirectory();
+
+  std::string str;
+  str += "[";
   for (int cnt = 0; true; ++cnt) {
     File entry = dir.openNextFile();
     if (!entry) {
       break;
     }
 
-    String output;
+    std::string output;
     if (cnt > 0) {
       output = ',';
     }
@@ -167,20 +170,67 @@ void FileWebServer::printDirectory() {
     output += entry.name();
     output += "\"";
     output += "}";
-    server.sendContent(output);
+    str += output;
     entry.close();
   }
-  server.sendContent("]");
+  str += "]";
+  server.setContentLength(str.length());
+  server.send(200, "text/json", str.c_str());
   dir.close();
+}
+
+void FileWebServer::loadIndexFile(const std::string& path) {
+  size_t totalBytes = getFsTotalBytes();
+  size_t usedBytes = getFsUsedBytes();
+  Serial.print("总大小: ");
+  Serial.print(totalBytes);
+  Serial.print("字节 ");
+  Serial.print("已用：");
+  Serial.println(usedBytes);
+
+  File file = SPIFFS.open(path.c_str(), "r");
+  if (!file) {
+      Serial.println("open spiffs file index.html failure");
+      return;
+  }
+
+  std::string& content = this->spiffsIndexFileStr;
+  uint8_t buffer[128] = {0};
+  while(file.available()) {
+      int count = file.read(buffer, 128);
+      std::string s = std::string((char*)buffer, count);
+      content.append(s);
+      memset(buffer, 0, 128);
+  }
+  int index = content.find("{{%total%}}");
+  Serial.println(index);
+
+  if (index != std::string::npos) {
+    std::string str = formatSpace(totalBytes);
+    content = content.replace(index, strlen("{{%total%}}"), str);   
+  } else {
+    Serial.println(index);
+  }
+
+  index = content.find("{{%used%}}");
+  if (index != std::string::npos) {
+    std::string str = formatSpace(usedBytes);
+    content = content.replace(index, strlen("{{%used%}}"), str);
+  } else {
+    Serial.println("not found string");
+  }
+  // return content;
 }
 
 void FileWebServer::handleIndex() {
     // Serial.println(spiffsIndexFileStr.c_str());
-    String content = String(spiffsIndexFileStr.c_str());
+    // String content = String(spiffsIndexFileStr.c_str());
     // Serial.println(spiffsIndexFileStr.c_str());
-    server.send(200, "text/html; charset=utf-8", content);
+    // server.send(200, "text/html; charset=utf-8", content);
+    // loadIndexFile("/index.htm");
+    // server.sendContent(content);
     
-    server.sendContent(content);
+    server.send(200, "text/html; charset=utf-8", this->spiffsIndexFileStr.c_str());
 }
 
 void FileWebServer::handleNotFound() {
@@ -270,6 +320,10 @@ bool FileWebServer::loadFile(const char* path) {
         dataType = "application/zip";
     }
 
+    if (!fileExists(p.c_str())) {
+      return false;
+    }
+
     File dataFile = open(p.c_str());
     if (dataFile.isDirectory()) {
         p += "/index.htm";
@@ -293,6 +347,13 @@ bool FileWebServer::loadFile(const char* path) {
     return true;
 }
 
+// void test() {
+//   File file = SD.open("/", "r");
+//     if (file.isDirectory()) {
+//       Serial.println("is dir");
+//     }
+// }
+
 void FileWebServer::setup(void) {
 
   if (MDNS.begin(HOST)) {
@@ -307,6 +368,7 @@ void FileWebServer::setup(void) {
   
   server.on("/", HTTP_GET, [&]() { handleIndex(); });
   server.on("/list", HTTP_GET,[&]() { printDirectory(); });
+  // server.on("/list", HTTP_GET, test);
   server.on("/delete", HTTP_POST, [&]() { handleDelete(); });
   server.on("/edit", HTTP_PUT, [&]() { handleCreate(); });
   server.on("/upload", HTTP_POST, [&]() { returnOK(); }, [&]() { handleFileUpload(); });
@@ -317,62 +379,28 @@ void FileWebServer::setup(void) {
   server.begin(FILEWEBSERVER_PORT);
   Serial.println("FileWebServer started");
 
-    // if (SD.begin(21)) {
-    //     Serial.println("SD Card initialized.");
-    //     hasSD = true;
-    // }
+  #ifdef FS
+    // #ifdef SD
+        SPIClass spi;
+        spi.begin(SPI_CLK, SPI_MISO, SPI_MOSI, SPI_CS);
+        if (!SD.begin(SPI_CS, spi)) {
+            Serial.println("sdcard init failure");
+        }
+    // #endif
+  #endif
 
-    if (!SPIFFS.begin(true)) {
-        Serial.println("SPIFFS 初始化失败");
-        return;
-    }
+  if (!SPIFFS.begin(true)) {
+      Serial.println("SPIFFS 初始化失败");
+      return;
+  }
 
-    size_t totalBytes = getFsTotalBytes();
-    size_t usedBytes = getFsUsedBytes();
-    Serial.print("总大小: ");
-    Serial.print(totalBytes);
-    Serial.print("字节 ");
-    Serial.print("已用：");
-    Serial.println(usedBytes);
+    loadIndexFile("/index.htm");
 
-    File file = SPIFFS.open("/index.htm", "r");
-    if (!file) {
-        Serial.println("open spiffs file index.html failure");
-        return;
-    }
-
-    uint8_t buffer[128] = {0};
-    while(file.available()) {
-        int count = file.read(buffer, 128);
-        std::string s = std::string((char*)buffer, count);
-        this->spiffsIndexFileStr.append(s);
-        memset(buffer, 0, 128);
-    }
-    int index = this->spiffsIndexFileStr.find("{{%total%}}");
-    Serial.println(index);
-    if (index != std::string::npos) {
-      char buffer[10];
-      memset(buffer, 0, 10);
-      sprintf(buffer, "%.2lf", (float)totalBytes / 1024 / 1024);
-      spiffsIndexFileStr = spiffsIndexFileStr.replace(index, strlen("{{%total%}}"), buffer);   
-    } else {
-      Serial.println(index);
-    }
-
-    index = this->spiffsIndexFileStr.find("{{%used%}}");
-    if (index != std::string::npos) {
-      char buffer[10];
-      memset(buffer, 0, 10);
-      sprintf(buffer, "%.2lf", (float)usedBytes / 1024 / 1024);
-      spiffsIndexFileStr = spiffsIndexFileStr.replace(index, strlen("{{%used%}}"), buffer);
-    } else {
-      Serial.println("not found string");
-    }
     // Serial.println(spiffsIndexFileStr.c_str());
-
+    xTaskCreatePinnedToCore(&FileWebServer::loopDelegate, "FileWebServerTask", 4096, this, 1, NULL, 0);
 }
 
 void FileWebServer::loop(void) {
   server.handleClient();
-//   delay(2);  //allow the cpu to switch to other tasks
+  delay(1);  //allow the cpu to switch to other tasks
 }

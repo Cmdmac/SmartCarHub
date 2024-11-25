@@ -74,6 +74,8 @@ void Net::setUpWebsocket(CommandCallback callback) {
   client.onEvent([&](WebsocketsEvent event, String data) { onEventsCallback(event, data); });
   client.connect(websockets_url);
   commandCallback = callback;
+
+  xTaskCreatePinnedToCore(&Net::wsDelegate, "WsTask", 4096, this, 1, NULL, 0);
 }
 
 WebsocketsClient& Net::ws() {

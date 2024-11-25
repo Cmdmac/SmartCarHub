@@ -19,9 +19,9 @@
 #include "DataChannel.h"
 // #include "Hall.h"
 #include "Mic.h"
-#include "SPIFFSServer.h"
 #include "AnalogMic.h"
 #include "Speaker.h"
+#include "FileWebServer.h"
 
 
 using namespace std;
@@ -32,58 +32,41 @@ extern QMC5883LCompass compass;
 extern iBeaconFinder finder;
 extern Net net;
 
-SPIFFSServer fileWebServer;
-Mic mic;
+FileWebServer fileWebServer;
+// Mic mic;
 
-Speaker speaker; 
-Camera camera;
+// Speaker speaker; 
+// Camera camera;
 
-Motor_TB6612FNG l = Motor_TB6612FNG(17, 18, 16, 8);
-// Motor_TB6612FNG l = Motor_TB6612FNG(20, 21, 19, 8);
-Motor_TB6612FNG r = Motor_TB6612FNG(3, 46, 9, 8);
-// Servo s = Servo(19);
-UltraSound us = UltraSound(7, 15);
-Car car = Car(&l, &r, /*&s,*/ &us);
+// Motor_TB6612FNG l = Motor_TB6612FNG(17, 18, 16, 8);
+// // Motor_TB6612FNG l = Motor_TB6612FNG(20, 21, 19, 8);
+// Motor_TB6612FNG r = Motor_TB6612FNG(3, 46, 9, 8);
+// // Servo s = Servo(19);
+// UltraSound us = UltraSound(7, 15);
+// Car car = Car(&l, &r, /*&s,*/ &us);
 
-#define SERVO_PIN   0
-#define MAX_WIDTH   2500
-#define MIN_WIDTH   1000
+// #define SERVO_PIN   0
+// #define MAX_WIDTH   2500
+// #define MIN_WIDTH   1000
 
-static const int servoPin = 35;
+// static const int servoPin = 35;
 
-Servo myservo;
-void ultrSoundTask(void* params) {
-  while (1)
-  {
-    int d = us.getDistance();
-    Serial.println(d);
-  }
+// Servo myservo;
+// void ultrSoundTask(void* params) {
+//   while (1)
+//   {
+//     int d = us.getDistance();
+//     Serial.println(d);
+//   }
   
-}
+// }
 
-#include "Hall.h"
-extern void initHall();
+// #include "Hall.h"
+// extern void initHall();
 
 Led led = Led();
 
-AnalogMic analogMic;
-
-// MPU control/status vars
-bool dmpReady = false;
-uint8_t mpuIntStatus;
-uint8_t devStatus;
-uint16_t packetSize;
-uint16_t fifoCount;
-uint8_t fifoBuffer[64];
-
-// orientation/motion vars
-Quaternion q;
-VectorInt16 aa;
-VectorInt16 aaReal;
-VectorInt16 aaWorld;
-VectorFloat gravity;
-float euler[3];
-float ypr[3];
+// AnalogMic analogMic;
 
 void setup() {
   Serial.begin(9600);
@@ -96,14 +79,14 @@ void setup() {
           float d = doc["data"];
           Serial.print(" direction=");
           Serial.println(d);
-          car.direct(d);
+          // car.direct(d);
         }
         break;
       case CMD_SET_SPEED: {
           float speed = doc["data"];
           Serial.print(" speed=");
           Serial.println(speed);
-          car.drive(speed);
+          // car.drive(speed);
         }
         break;
     }
@@ -111,7 +94,7 @@ void setup() {
 
   // startTasks();
 
-  // fileWebServer.setup();
+  fileWebServer.setup();
   // analogMic.setup();
   // analogMic.record("/analogvoice.wav", 5);
 
@@ -128,9 +111,18 @@ void setup() {
   // led.setFadeMount(10);
   // car.setSpeed(0.5);
   // initHall();
-  led.setUp(0);
+  // led.setUp(0);
 
-  
+  // SPIClass spi;
+  // spi.begin(SPI_CLK, SPI_MISO, SPI_MOSI, SPI_CS);
+  // if (!SD.begin(SPI_CS, spi)) {
+  //     Serial.println("sdcard init failure");
+  // }
+
+  // File file = SD.open("/", "r");
+  // if (file.isDirectory()) {
+  //   Serial.println("is dir");
+  // }
 }
 
 float step = 0.1;
@@ -138,7 +130,6 @@ int pos = 0;    // variable to store the servo position
 
 void loop() {
   net.loop();
-  // fileWebServer.loop();
   // speaker.loop();
   // car.speedDown();
   // delay(1000);
@@ -146,16 +137,7 @@ void loop() {
   // audio.loop();
   // // delay(15000);
 
-  // for (pos = 0; pos <= 180; pos += 1) { // goes from 0 degrees to 180 degrees
-	// 	// in steps of 1 degree
-	// 	myservo.write(pos);    // tell servo to go to position in variable 'pos'
-	// 	delay(15);             // waits 15ms for the servo to reach the position
-	// }
-	// for (pos = 180; pos >= 0; pos -= 1) { // goes from 180 degrees to 0 degrees
-	// 	myservo.write(pos);    // tell servo to go to position in variable 'pos'
-	// 	delay(15);             // waits 15ms for the servo to reach the position
-	// }
-  led.flicker();
+  // led.flicker();
   // led.autoFade();
 
   

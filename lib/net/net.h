@@ -23,6 +23,14 @@ class Net {
     private:
         void onMessageCallback(WebsocketsMessage message);
         void onEventsCallback(WebsocketsEvent event, String data);
+
+        static void wsDelegate(void *pvParameters) {
+          Net* instance = static_cast<Net*>(pvParameters);
+          while(1) {
+            instance->loop();
+            delay(1);
+          }
+        }
         WebsocketsClient client;
         CommandCallback commandCallback;
 };
