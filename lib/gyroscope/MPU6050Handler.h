@@ -80,3 +80,4 @@ class MPU6050Handler {
             delay(100);
         }
 };
+#endif

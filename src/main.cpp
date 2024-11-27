@@ -23,6 +23,7 @@
 #include "Speaker.h"
 #include "FileWebServer.h"
 
+#include "QMI8658Handler.h"
 
 using namespace std;
 using namespace websockets;
@@ -33,6 +34,7 @@ extern iBeaconFinder finder;
 extern Net net;
 
 FileWebServer fileWebServer;
+QMI8658Handler qmi8658Handler;
 // Mic mic;
 
 // Speaker speaker; 
@@ -94,7 +96,7 @@ void setup() {
 
   // startTasks();
 
-  fileWebServer.setup();
+  // fileWebServer.setup();
   // analogMic.setup();
   // analogMic.record("/analogvoice.wav", 5);
 
@@ -123,6 +125,10 @@ void setup() {
   // if (file.isDirectory()) {
   //   Serial.println("is dir");
   // }
+
+  // qmi.begin(Wire, 14, 13, QMI8658_L_SLAVE_ADDRESS);
+    //Using WIRE !!
+  
 }
 
 float step = 0.1;
