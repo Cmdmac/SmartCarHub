@@ -12,12 +12,18 @@
 #define FILEWEBSERVER_PORT 88
 #define HOST "esp32sd"
 
-#define SPI_CS 15
-#define SPI_MOSI 16
-#define SPI_CLK 17
-#define SPI_MISO 18
+#define SPI_CS 19
+#define SPI_MOSI 21
+#define SPI_CLK 20
+#define SPI_MISO 47
 
+#define FS_MODE 1
+
+#if FS_MODE 1
 #define FS SD
+#elif FS_MODE 0
+#define FS SPIFFS
+#endif
 
 class FileWebServer {
     private:
