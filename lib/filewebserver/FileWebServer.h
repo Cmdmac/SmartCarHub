@@ -19,9 +19,9 @@
 
 #define FS_MODE 1
 
-#if FS_MODE 1
+#if FS_MODE == 1
 #define FS SD
-#elif FS_MODE 0
+#elif FS_MODE == 0
 #define FS SPIFFS
 #endif
 

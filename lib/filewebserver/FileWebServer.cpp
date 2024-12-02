@@ -379,7 +379,7 @@ void FileWebServer::setup(void) {
   server.begin(FILEWEBSERVER_PORT);
   Serial.println("FileWebServer started");
 
-  #if FS_MODE 1
+  #if FS_MODE == 1
     // #ifdef SD
         SPIClass spi;
         spi.begin(SPI_CLK, SPI_MISO, SPI_MOSI, SPI_CS);
