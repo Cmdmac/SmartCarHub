@@ -24,6 +24,9 @@
 #include "FileWebServer.h"
 
 #include "QMI8658Handler.h"
+#include "PCA9555.h"
+
+PCA9555 ioport(0x27, 4, 5);
 
 using namespace std;
 using namespace websockets;
@@ -129,6 +132,24 @@ void setup() {
   // qmi.begin(Wire, 14, 13, QMI8658_L_SLAVE_ADDRESS);
     //Using WIRE !!
   
+  //
+	// start I2C
+	//
+	ioport.begin();
+	//
+	// sets the I2C clock to 400kHz
+	//
+	ioport.setClock(400000);
+	//
+	// set first 14 pins to output
+	//
+	for (uint8_t i = 0; i < 17; i++){
+		ioport.pinMode(i, OUTPUT);
+	}
+	//
+	// set pin 15  (=digital 15) to Input
+	//
+	// ioport.pinMode(ED14, INPUT);
 }
 
 float step = 0.1;
@@ -146,5 +167,23 @@ void loop() {
   // led.flicker();
   // led.autoFade();
 
-  
+  //
+	// check if button is LOW
+	//
+	// if (ioport.digitalRead(ED14) == LOW) {
+		//
+		// turn all 14 leds on
+		//
+		for (uint8_t i = 0; i < 17; i++){
+			ioport.digitalWrite(i, HIGH);
+			delay(10);
+		}
+		//
+		// turn all 14 leds off
+		//
+		for (uint8_t i = 0; i < 17; i++){
+			ioport.digitalWrite(i, LOW);
+			delay(10);
+		}
+	// }
 }
