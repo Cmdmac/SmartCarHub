@@ -12,10 +12,10 @@
 #define FILEWEBSERVER_PORT 88
 #define HOST "esp32sd"
 
-#define SPI_CS 19
-#define SPI_MOSI 21
+#define SPI_CS 46
+#define SPI_MOSI 3
 #define SPI_CLK 20
-#define SPI_MISO 47
+#define SPI_MISO 19
 
 #define FS_MODE 1
 

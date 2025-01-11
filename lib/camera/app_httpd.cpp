@@ -30,11 +30,11 @@ static const char *TAG = "camera_httpd";
 
 // Face Detection will not work on boards without (or with disabled) PSRAM
 #ifdef BOARD_HAS_PSRAM
-#define CONFIG_ESP_FACE_DETECT_ENABLED 1
+#define CONFIG_ESP_FACE_DETECT_ENABLED 0
 // Face Recognition takes upward from 15 seconds per frame on chips other than ESP32S3
 // Makes no sense to have it enabled for them
 #if CONFIG_IDF_TARGET_ESP32S3
-#define CONFIG_ESP_FACE_RECOGNITION_ENABLED 1
+#define CONFIG_ESP_FACE_RECOGNITION_ENABLED 0
 #else
 #define CONFIG_ESP_FACE_RECOGNITION_ENABLED 0
 #endif
@@ -46,16 +46,16 @@ static const char *TAG = "camera_httpd";
 #if CONFIG_ESP_FACE_DETECT_ENABLED
 
 #include <vector>
-#include "human_face_detect_msr01.hpp"
-#include "human_face_detect_mnp01.hpp"
+// #include "human_face_detect_msr01.hpp"
+// #include "human_face_detect_mnp01.hpp"
 
 #define TWO_STAGE 1 /*<! 1: detect by two-stage which is more accurate but slower(with keypoints). */
                     /*<! 0: detect by one-stage which is less accurate but faster(without keypoints). */
 
 #if CONFIG_ESP_FACE_RECOGNITION_ENABLED
-#include "face_recognition_tool.hpp"
-#include "face_recognition_112_v1_s16.hpp"
-#include "face_recognition_112_v1_s8.hpp"
+// #include "face_recognition_tool.hpp"
+// #include "face_recognition_112_v1_s16.hpp"
+// #include "face_recognition_112_v1_s8.hpp"
 
 #define QUANT_TYPE 0 //if set to 1 => very large firmware, very slow, reboots when streaming...
 

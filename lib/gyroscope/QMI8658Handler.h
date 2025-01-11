@@ -1,6 +1,8 @@
 #pragma once
 #include "QMI8658/SensorQMI8658.hpp"
 
+#define PIN_I2C_SDA 14
+#define PIN_I2C_SCL 13
 class QMI8658Handler {
     private:
         SensorQMI8658 qmi;
@@ -9,7 +11,7 @@ class QMI8658Handler {
         
     public:
         void setup() {
-            if (!qmi.begin(Wire, QMI8658_L_SLAVE_ADDRESS, 14, 13)) {
+            if (!qmi.begin(Wire, QMI8658_L_SLAVE_ADDRESS, PIN_I2C_SDA, PIN_I2C_SCL)) {
                 Serial.println("Failed to find QMI8658 - check your wiring!");
                 while (1) {
                     delay(1000);

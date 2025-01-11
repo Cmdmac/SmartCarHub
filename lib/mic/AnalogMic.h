@@ -35,7 +35,7 @@ private:
     /* data */
     
     void initWAVHeader(WAVHeader &header, int dataSize);
-    void intToByteArray(int value, byte *array, int startIndex);
+    void intToByteArray(int value, unsigned char *array, int startIndex);
 public:
     // AnalogMic(/* args */);
     // ~AnalogMic();

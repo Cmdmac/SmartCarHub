@@ -11,7 +11,7 @@ void BleCallback::onResult(BLEAdvertisedDevice adv) {
     // Serial.println(adv.getName().c_str());
     if (strcmp(name, "Holy-IOT") == 0) {
         // devices[len++] = beacon;
-        string address = adv.getAddress().toString();
+        string address = adv.getAddress().toString().c_str();
         bool isFound = false;
         for (std::vector<iBeacon>::iterator it = devices.begin(); it!= devices.end(); ++it) {
             if (it->address.compare(address) == 0) {
@@ -25,8 +25,8 @@ void BleCallback::onResult(BLEAdvertisedDevice adv) {
         }
         if (!isFound) {
             iBeacon beacon;
-            beacon.name = adv.getName();
-            beacon.address = adv.getAddress().toString();
+            beacon.name = adv.getName().c_str();
+            beacon.address = adv.getAddress().toString().c_str();
             beacon.rssi = adv.getRSSI();
             devices.push_back(beacon);
             Serial.print("add beacon ");

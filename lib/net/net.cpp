@@ -22,6 +22,29 @@ string Net::httpGet(string url) {
     return string();
 }
 
+void Net::httpPost(string url, char* fileData, int fileDataLength) {
+
+    HTTPClient http;
+    http.begin(url.c_str());
+    // 设置二进制文件上传的请求头
+    http.addHeader("Content-Type", "application/octet-stream");
+    // 读取文件长度
+    // int fileLength = binaryFile.size();
+    // 创建一个缓冲区来存储文件数据
+    // char* fileData = new char[fileLength];
+    // binaryFile.read(fileData, fileLength);
+    int httpResponseCode = http.POST((uint8_t*)fileData, fileDataLength);
+    if (httpResponseCode > 0) {
+        Serial.print("HTTP Response code: ");
+        Serial.println(httpResponseCode);
+    } else {
+        Serial.print("Error on sending POST: ");
+        Serial.println(httpResponseCode);
+    }
+    http.end();
+
+}
+
 const char* ssid     = "Stark";  // 替换为您的 Wi-Fi 网络名称
 const char* password = "fengzhiping,1101";  // 替换为您的 Wi-Fi 密码
 const char* websockets_url = "ws://192.168.2.153:3000/mobile/hub"; //Enter server adress
@@ -66,7 +89,7 @@ void Net::setUpWifi() {
 }
 
 void Net::setUpWebsocket(CommandCallback callback) {
-  Serial.begin(9600);
+  // Serial.begin(9600);
   Serial.println("setup websocket");
   // client.onMessage(onMessageCallback2);
 

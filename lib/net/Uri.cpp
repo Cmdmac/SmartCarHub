@@ -1,5 +1,6 @@
 #include "Uri.h"
 #include <sstream>
+using namespace Stark;
 
 // 构造函数
 Uri::Uri(const char* uri) : uriString(uri) {
